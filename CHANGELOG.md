@@ -6,7 +6,8 @@ All notable project changes should be recorded here.
 
 - Revised the MVP from mentor-request and messaging workflows to a feed, comments, voting, leaderboard, and moderation model.
 - Added revised AI context pack and source-of-truth markdown files.
-- Added revised 6-week sprint plan aligned to the professor-defined MVP.
+- Added the Sprint 1 project scaffold with TypeScript app structure, protected shell routing, and a development-only mock OAuth session flow.
+- Added Vitest-based scaffold tests and updated the frontend toolchain for TypeScript, linting, and production build verification.
 
 ## Sprint 1 - Foundation
 
