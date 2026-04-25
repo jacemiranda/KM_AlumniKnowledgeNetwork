@@ -14,6 +14,7 @@ const defaultMockUser: SessionUser = {
   email: 'jordan@example.com',
   role: 'end_user',
   userType: 'alumni',
+  profileCompleted: false,
 }
 
 export function AuthProvider({ children }: PropsWithChildren) {
@@ -24,6 +25,23 @@ export function AuthProvider({ children }: PropsWithChildren) {
       session,
       signInWithMockGoogle: () => {
         const nextSession = { user: defaultMockUser }
+        writeStoredSession(nextSession)
+        setSession(nextSession)
+      },
+      completeMockProfile: ({ name, userType }) => {
+        if (!session) {
+          return
+        }
+
+        const nextSession: MockSession = {
+          user: {
+            ...session.user,
+            name,
+            userType,
+            profileCompleted: true,
+          },
+        }
+
         writeStoredSession(nextSession)
         setSession(nextSession)
       },

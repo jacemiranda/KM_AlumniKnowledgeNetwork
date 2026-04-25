@@ -10,14 +10,14 @@ describe('App scaffold auth flow', () => {
     render(<App />)
 
     expect(
-      screen.getByRole('heading', { name: /welcome to alumni knowledge network/i }),
+      screen.getByRole('heading', { name: /sign in to alumni knowledge network/i }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /continue with google \(dev mode\)/i }),
+      screen.getByRole('button', { name: /sign in with google/i }),
     ).toBeInTheDocument()
   })
 
-  it('restores a stored session and lands on the feed shell', () => {
+  it('restores a completed profile session and lands on the feed shell', () => {
     window.localStorage.setItem(
       'akn.mock-session',
       JSON.stringify({
@@ -27,6 +27,28 @@ describe('App scaffold auth flow', () => {
           email: 'jordan@example.com',
           role: 'end_user',
           userType: 'alumni',
+          profileCompleted: true,
+        },
+      }),
+    )
+
+    render(<App />)
+
+    expect(screen.getByPlaceholderText(/share a practical insight/i)).toBeInTheDocument()
+    expect(screen.getByText(/jordan reyes/i)).toBeInTheDocument()
+  })
+
+  it('routes incomplete profile sessions to first-time setup', () => {
+    window.localStorage.setItem(
+      'akn.mock-session',
+      JSON.stringify({
+        user: {
+          id: 'dev-student',
+          name: 'Casey Diaz',
+          email: 'casey@example.com',
+          role: 'end_user',
+          userType: 'student',
+          profileCompleted: false,
         },
       }),
     )
@@ -34,8 +56,7 @@ describe('App scaffold auth flow', () => {
     render(<App />)
 
     expect(
-      screen.getByRole('heading', { name: /universal feed/i }),
+      screen.getByRole('heading', { name: /complete your profile/i }),
     ).toBeInTheDocument()
-    expect(screen.getByText(/jordan reyes/i)).toBeInTheDocument()
   })
 })
