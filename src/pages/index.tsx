@@ -1,3 +1,6 @@
+import { FeedPage as FeedFeaturePage } from '../features/feed/FeedPage'
+import { SetupPage as SetupFeaturePage } from '../features/setup/SetupPage'
+
 type PlaceholderPageProps = {
   title: string
   description: string
@@ -5,21 +8,20 @@ type PlaceholderPageProps = {
 
 function PlaceholderPage({ title, description }: PlaceholderPageProps) {
   return (
-    <div className="placeholder-page">
-      <p className="eyebrow">Shell placeholder</p>
-      <h2>{title}</h2>
-      <p className="page-copy">{description}</p>
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-slate-100 shadow-liquid backdrop-blur-2xl">
+      <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Shell placeholder</p>
+      <h2 className="mt-3 text-3xl font-black tracking-tight text-white">{title}</h2>
+      <p className="mt-3 text-base text-slate-300">{description}</p>
     </div>
   )
 }
 
 export function FeedPage() {
-  return (
-    <PlaceholderPage
-      title="Universal Feed"
-      description="This is the feed-first landing page for authenticated users. Posting, comments, and field filters will be added in later Sprint 1 and Sprint 2 PRs."
-    />
-  )
+  return <FeedFeaturePage />
+}
+
+export function SetupPage() {
+  return <SetupFeaturePage />
 }
 
 export function ProfilePage() {

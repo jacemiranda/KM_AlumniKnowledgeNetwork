@@ -6,6 +6,7 @@ export type SessionUser = {
   email: string
   role: 'admin' | 'moderator' | 'end_user'
   userType: 'student' | 'alumni'
+  profileCompleted?: boolean
 }
 
 export type MockSession = {
@@ -31,13 +32,20 @@ export function readStoredSession(): MockSession | null {
       (user.role !== 'admin' &&
         user.role !== 'moderator' &&
         user.role !== 'end_user') ||
-      (user.userType !== 'student' && user.userType !== 'alumni')
+      (user.userType !== 'student' && user.userType !== 'alumni') ||
+      (user.profileCompleted !== undefined &&
+        typeof user.profileCompleted !== 'boolean')
     ) {
       window.localStorage.removeItem(MOCK_SESSION_STORAGE_KEY)
       return null
     }
 
-    return { user }
+    return {
+      user: {
+        ...user,
+        profileCompleted: user.profileCompleted ?? false,
+      },
+    }
   } catch {
     window.localStorage.removeItem(MOCK_SESSION_STORAGE_KEY)
     return null
