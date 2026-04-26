@@ -1,30 +1,55 @@
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
+import { fetchFields, fetchSkills, type FieldRow, type SkillRow } from '../auth/profile-service'
+import { getSupabaseClient } from '../../lib/supabase'
 
 type SetupState = 'idle' | 'submitting' | 'error'
 
 type UserType = 'student' | 'alumni'
 
-const fieldOptions = [
-  'Computer Science',
-  'Engineering',
-  'Business',
-  'Natural Sciences',
-  'Arts and Humanities',
-]
-
-const suggestedSkills = ['Machine Learning', 'Data Analysis', 'Research Writing']
-
 export function SetupPage() {
-  const { session, completeMockProfile } = useAuth()
+  const { session, profile, completeProfile } = useAuth()
   const navigate = useNavigate()
 
-  const [name, setName] = useState(session?.user.name ?? '')
-  const [userType, setUserType] = useState<UserType>(session?.user.userType ?? 'student')
-  const [field, setField] = useState('')
-  const [bio, setBio] = useState('')
+  const [name, setName] = useState(profile?.name || session?.user.name || '')
+  const [userType, setUserType] = useState<UserType>(profile?.userType ?? 'student')
+  const [fieldId, setFieldId] = useState(profile?.fieldId ?? '')
+  const [bio, setBio] = useState(profile?.bio ?? '')
+  const [profilePictureUrl, setProfilePictureUrl] = useState(profile?.profilePictureUrl ?? '')
+  const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([])
+  const [fields, setFields] = useState<FieldRow[]>([])
+  const [skills, setSkills] = useState<SkillRow[]>([])
   const [state, setState] = useState<SetupState>('idle')
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadSetupOptions() {
+      try {
+        const client = getSupabaseClient()
+        const [nextFields, nextSkills] = await Promise.all([
+          fetchFields(client),
+          fetchSkills(client),
+        ])
+
+        if (isMounted) {
+          setFields(nextFields)
+          setSkills(nextSkills)
+        }
+      } catch {
+        if (isMounted) {
+          setState('error')
+        }
+      }
+    }
+
+    void loadSetupOptions()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   if (!session) {
     return <Navigate to="/login" replace />
@@ -34,22 +59,37 @@ export function SetupPage() {
     return <Navigate to="/" replace />
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!name.trim() || !field.trim()) {
+    if (!name.trim() || !fieldId.trim()) {
       setState('error')
       return
     }
 
     setState('submitting')
-    window.setTimeout(() => {
-      completeMockProfile({
+
+    try {
+      await completeProfile({
         name: name.trim(),
+        bio: bio.trim(),
         userType,
+        fieldId,
+        profilePictureUrl,
+        skillIds: selectedSkillIds,
       })
       navigate('/')
-    }, 250)
+    } catch {
+      setState('error')
+    }
+  }
+
+  const toggleSkill = (skillId: string) => {
+    setSelectedSkillIds((current) =>
+      current.includes(skillId)
+        ? current.filter((selectedSkillId) => selectedSkillId !== skillId)
+        : [...current, skillId],
+    )
   }
 
   return (
@@ -86,6 +126,16 @@ export function SetupPage() {
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Your full name"
                 required
+              />
+              <label className="mt-4 block text-xs font-bold uppercase tracking-[0.18em] text-slate-300" htmlFor="profile-picture-url">
+                Profile Picture URL
+              </label>
+              <input
+                id="profile-picture-url"
+                className="mt-2 w-full rounded-2xl border border-white/10 bg-ink-900/60 px-5 py-3 text-base text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                value={profilePictureUrl}
+                onChange={(event) => setProfilePictureUrl(event.target.value)}
+                placeholder="https://..."
               />
             </div>
           </div>
@@ -128,14 +178,14 @@ export function SetupPage() {
               <select
                 id="field"
                 className="mt-2 w-full rounded-2xl border border-white/10 bg-ink-900/60 px-5 py-3 text-base text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-                value={field}
-                onChange={(event) => setField(event.target.value)}
+                value={fieldId}
+                onChange={(event) => setFieldId(event.target.value)}
                 required
               >
                 <option value="">Select your field of study...</option>
-                {fieldOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
+                {fields.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.name}
                   </option>
                 ))}
               </select>
@@ -158,12 +208,24 @@ export function SetupPage() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-300">Core Skills and Interests</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              {suggestedSkills.map((skill) => (
-                <span key={skill} className="rounded-full border border-emerald-300/50 bg-emerald-300/15 px-4 py-2 text-sm text-emerald-100">
-                  {skill}
-                </span>
+              {skills.map((skill) => (
+                <label
+                  key={skill.id}
+                  className={`cursor-pointer rounded-full border px-4 py-2 text-sm transition ${
+                    selectedSkillIds.includes(skill.id)
+                      ? 'border-emerald-300/50 bg-emerald-300/15 text-emerald-100'
+                      : 'border-white/15 bg-white/5 text-slate-300'
+                  }`}
+                >
+                  <input
+                    className="sr-only"
+                    type="checkbox"
+                    checked={selectedSkillIds.includes(skill.id)}
+                    onChange={() => toggleSkill(skill.id)}
+                  />
+                  {skill.name}
+                </label>
               ))}
-              <span className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-slate-300">+ Add Skill</span>
             </div>
           </div>
 

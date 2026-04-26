@@ -1,56 +1,196 @@
-import { PropsWithChildren, useMemo, useState } from 'react'
+import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
+import { getSupabaseClient } from '../../lib/supabase'
+import { AuthContext, type AppSession, type AuthContextValue, type AuthStatus } from './context'
 import {
-  clearStoredSession,
-  MockSession,
-  readStoredSession,
-  SessionUser,
-  writeStoredSession,
-} from './storage'
-import { AuthContext, AuthContextValue } from './context'
+  fetchCurrentProfile,
+  type AuthProfile,
+  type CompleteProfileInput,
+  type SupabaseProfileClient,
+  updateCurrentProfile,
+} from './profile-service'
 
-const defaultMockUser: SessionUser = {
-  id: 'dev-alumni',
-  name: 'Jordan Reyes',
-  email: 'jordan@example.com',
-  role: 'end_user',
-  userType: 'alumni',
-  profileCompleted: false,
+type SupabaseAuthSession = {
+  user: {
+    id: string
+    email?: string | null
+  }
 }
 
-export function AuthProvider({ children }: PropsWithChildren) {
-  const [session, setSession] = useState<MockSession | null>(() => readStoredSession())
+export type AuthSupabaseClient = SupabaseProfileClient & {
+  auth: {
+    getSession: () => Promise<{
+      data: { session: SupabaseAuthSession | null }
+      error: { message: string } | null
+    }>
+    onAuthStateChange: (
+      callback: (event: string, session: SupabaseAuthSession | null) => void,
+    ) => {
+      data: {
+        subscription: {
+          unsubscribe: () => void
+        }
+      }
+    }
+    signInWithOAuth: (input: {
+      provider: 'google'
+      options: { redirectTo: string }
+    }) => Promise<{ error: { message: string } | null }>
+    signOut: () => Promise<{ error: { message: string } | null }>
+  }
+}
+
+type AuthProviderProps = PropsWithChildren<{
+  client?: AuthSupabaseClient
+}>
+
+function buildAppSession(
+  supabaseSession: SupabaseAuthSession | null,
+  profile: AuthProfile | null,
+): AppSession | null {
+  if (!supabaseSession) {
+    return null
+  }
+
+  return {
+    user: {
+      id: supabaseSession.user.id,
+      email: profile?.email ?? supabaseSession.user.email ?? '',
+      name: profile?.name || supabaseSession.user.email || 'Alumni Network User',
+      role: profile?.role ?? 'end_user',
+      userType: profile?.userType ?? null,
+      profileCompleted: profile?.isFirstTimeSetupComplete ?? false,
+    },
+  }
+}
+
+function getAuthErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : 'Authentication failed.'
+}
+
+export function AuthProvider({ children, client }: AuthProviderProps) {
+  const [supabaseClient] = useState<AuthSupabaseClient>(() =>
+    client ?? (getSupabaseClient() as unknown as AuthSupabaseClient),
+  )
+  const [supabaseSession, setSupabaseSession] = useState<SupabaseAuthSession | null>(null)
+  const [profile, setProfile] = useState<AuthProfile | null>(null)
+  const [status, setStatus] = useState<AuthStatus>('loading')
+  const [error, setError] = useState<string | null>(null)
+
+  const loadProfile = useCallback(
+    async (nextSession: SupabaseAuthSession | null) => {
+      if (!nextSession) {
+        setSupabaseSession(null)
+        setProfile(null)
+        setStatus('unauthenticated')
+        return
+      }
+
+      setSupabaseSession(nextSession)
+      const nextProfile = await fetchCurrentProfile(supabaseClient, nextSession.user.id)
+      setProfile(nextProfile)
+      setStatus('authenticated')
+    },
+    [supabaseClient],
+  )
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function initializeSession() {
+      try {
+        setStatus('loading')
+        const { data, error: sessionError } = await supabaseClient.auth.getSession()
+
+        if (sessionError) {
+          throw new Error(sessionError.message)
+        }
+
+        if (isMounted) {
+          await loadProfile(data.session)
+        }
+      } catch (authError) {
+        if (isMounted) {
+          setError(getAuthErrorMessage(authError))
+          setStatus('error')
+        }
+      }
+    }
+
+    void initializeSession()
+
+    const {
+      data: { subscription },
+    } = supabaseClient.auth.onAuthStateChange((_event, nextSession) => {
+      void loadProfile(nextSession).catch((authError) => {
+        setError(getAuthErrorMessage(authError))
+        setStatus('error')
+      })
+    })
+
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
+  }, [loadProfile, supabaseClient])
+
+  const refreshProfile = useCallback(async () => {
+    await loadProfile(supabaseSession)
+  }, [loadProfile, supabaseSession])
+
+  const signInWithGoogle = useCallback(async () => {
+    setError(null)
+    const { error: signInError } = await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin,
+      },
+    })
+
+    if (signInError) {
+      setError(signInError.message)
+      setStatus('error')
+    }
+  }, [supabaseClient])
+
+  const completeProfile = useCallback(
+    async (input: CompleteProfileInput) => {
+      if (!supabaseSession) {
+        throw new Error('You must be signed in to complete setup.')
+      }
+
+      setError(null)
+      await updateCurrentProfile(supabaseClient, supabaseSession.user.id, input)
+      await loadProfile(supabaseSession)
+    },
+    [loadProfile, supabaseClient, supabaseSession],
+  )
+
+  const signOut = useCallback(async () => {
+    const { error: signOutError } = await supabaseClient.auth.signOut()
+
+    if (signOutError) {
+      setError(signOutError.message)
+      setStatus('error')
+      return
+    }
+
+    setSupabaseSession(null)
+    setProfile(null)
+    setStatus('unauthenticated')
+  }, [supabaseClient])
 
   const value = useMemo<AuthContextValue>(
     () => ({
-      session,
-      signInWithMockGoogle: () => {
-        const nextSession = { user: defaultMockUser }
-        writeStoredSession(nextSession)
-        setSession(nextSession)
-      },
-      completeMockProfile: ({ name, userType }) => {
-        if (!session) {
-          return
-        }
-
-        const nextSession: MockSession = {
-          user: {
-            ...session.user,
-            name,
-            userType,
-            profileCompleted: true,
-          },
-        }
-
-        writeStoredSession(nextSession)
-        setSession(nextSession)
-      },
-      signOut: () => {
-        clearStoredSession()
-        setSession(null)
-      },
+      status,
+      error,
+      session: buildAppSession(supabaseSession, profile),
+      profile,
+      refreshProfile,
+      signInWithGoogle,
+      completeProfile,
+      signOut,
     }),
-    [session],
+    [completeProfile, error, profile, refreshProfile, signInWithGoogle, signOut, status, supabaseSession],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

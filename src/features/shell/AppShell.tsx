@@ -29,7 +29,7 @@ export function AppShell() {
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Alumni Knowledge Network</p>
             <h1 className="mt-2 text-2xl font-black tracking-tight text-white">EraLink Feed Shell</h1>
             <p className="mt-3 text-sm text-slate-300">
-              OAuth entry, profile setup, and feed-first navigation for Sprint 1 PR-02.
+              OAuth entry, profile setup, and feed-first navigation for Sprint 1.
             </p>
           </div>
 
@@ -62,7 +62,7 @@ export function AppShell() {
                 <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Authenticated</p>
                 <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
                 <p className="text-sm text-slate-300">
-                  {session.user.userType} · {session.user.email}
+                  {session.user.userType ?? 'profile pending'} - {session.user.email}
                 </p>
               </div>
 
