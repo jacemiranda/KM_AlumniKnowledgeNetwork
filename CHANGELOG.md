@@ -10,6 +10,7 @@ All notable project changes should be recorded here.
 - Added Vitest-based scaffold tests and updated the frontend toolchain for TypeScript, linting, and production build verification.
 - Added the Sprint 1 PR-02 Supabase schema foundation for profiles, fields, skills, feed posts, and tags with RLS policies and seed taxonomy.
 - Added the Sprint 1 PR-03 Supabase Google OAuth session flow and first-time profile setup persistence.
+- Added Sprint 1 PR-04 documentation artifacts: initial ADR set for implemented decisions and the expanded M2 developer prompt log.
 
 ## Sprint 1 - Foundation
 
