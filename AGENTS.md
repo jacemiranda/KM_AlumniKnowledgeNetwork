@@ -69,6 +69,15 @@ Purpose:
 - follow branch, review, and merge rules
 - verify the work is acceptable and runnable
 
+## Commit Messages
+
+Use short, clear commit messages:
+
+- `feat: add post creation and comments flow`
+- `db: add profiles fields and skills schema`
+- `docs: add authority score guidelines`
+- `test: add final page-map QA checklist`
+
 ## Source of Truth Order
 
 For implementation work, follow this priority order:
