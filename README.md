@@ -84,11 +84,30 @@ Rules:
 
 ## Environment Variables
 
-Create `.env.local` from `.env.example` when the app is scaffolded.
+Create `.env.local` (or `.env`) from `.env.example` when the app is scaffolded.
 
 Expected variables:
 
-`VITE_SUPABASE_URL=`
-`VITE_SUPABASE_ANON_KEY=`
+```bash
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+
+# StitchMCP
+STITCH_API_KEY=
+STITCH_PROJECT_ID=
+```
 
 Never commit real secrets.
+
+## Team AI Setup (StitchMCP)
+
+This project uses **StitchMCP** for UI generation and design automation. To ensure all team members have access to the same design workspace:
+
+1. **Get an API Key**: Obtain your `STITCH_API_KEY` from the project administrator.
+2. **Setup Local Environment**:
+   - Copy `.env.example` to `.env`.
+   - Paste your API key and the shared `STITCH_PROJECT_ID` into the respective fields.
+3. **Configure your AI Assistant**:
+   - Use the template provided in [.mcp/config.json](.mcp/config.json).
+   - For **Antigravity**: Merge the `StitchMCP` entry from `.mcp/config.json` into your global `mcp_config.json`.
+   - For **Claude Desktop**: Update your `claude_desktop_config.json` with the same entry.
