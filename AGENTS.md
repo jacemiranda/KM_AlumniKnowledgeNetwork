@@ -69,6 +69,26 @@ Purpose:
 - follow branch, review, and merge rules
 - verify the work is acceptable and runnable
 
+
+## Stitch Usage Rule
+
+The Stitch workspace is used as a UI and design reference only.
+
+Source of truth order:
+
+1. `docs/project/ROLE_PR_MAP.md`
+2. `docs/project/SPRINT_DELIVERABLES.md`
+3. `docs/project/MVP.md`
+4. existing implemented code
+5. Stitch workspace for UI reference only
+
+Rules:
+
+- M2 and other technical roles must not use Stitch as the source of truth for backend logic, database design, architecture, or PR scope.
+- M2 may use Stitch only when UI-facing data, labels, flow, or response shape need visual alignment.
+- M3 may use Stitch as the main design workspace for UI implementation.
+- If Stitch conflicts with the MVP, sprint deliverables, or implemented behavior, surface the conflict clearly instead of guessing.
+
 ## Commit Messages
 
 Use short, clear commit messages:
