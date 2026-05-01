@@ -2,7 +2,8 @@ import { Link, useParams } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
 import { CommentThread } from './CommentThread'
 import { useDeletePost, usePost } from './use-posts'
-import { useCastVote } from './use-votes'
+import { useCastVote, useMyVote, useRemoveVote } from './use-votes'
+import type { VoteValue } from './vote-service'
 
 function timeAgo(dateStr: string): string {
   const now = Date.now()
@@ -23,6 +24,8 @@ export function PostDetail() {
   const { data: post, isLoading, error } = usePost(postId ?? '')
   const deletePost = useDeletePost()
   const castVote = useCastVote()
+  const removeVote = useRemoveVote()
+  const myVote = useMyVote(post?.author_id ?? '')
 
   if (isLoading) {
     return (
@@ -60,14 +63,13 @@ export function PostDetail() {
     window.location.href = '/'
   }
 
-  function handleUpvote() {
+  function handleVote(value: VoteValue) {
     if (!canVote) return
-    castVote.mutate({ targetId: post!.author_id, value: 1 })
-  }
-
-  function handleDownvote() {
-    if (!canVote) return
-    castVote.mutate({ targetId: post!.author_id, value: -1 })
+    if (myVote.data === value) {
+      removeVote.mutate(post!.author_id)
+      return
+    }
+    castVote.mutate({ targetId: post!.author_id, value })
   }
 
   return (
@@ -168,19 +170,35 @@ export function PostDetail() {
             <>
               <button
                 type="button"
-                onClick={handleUpvote}
-                disabled={castVote.isPending}
-                className="rounded-full border border-emerald-300/30 bg-emerald-300/10 px-3 py-1.5 text-xs font-bold text-emerald-200 transition hover:bg-emerald-300/20 disabled:opacity-50"
+                onClick={() => handleVote(1)}
+                disabled={castVote.isPending || removeVote.isPending}
+                aria-pressed={myVote.data === 1}
+                className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold text-emerald-200 transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                  myVote.data === 1
+                    ? 'border-emerald-300/60 bg-emerald-300/20'
+                    : 'border-emerald-300/30 bg-emerald-300/10 hover:bg-emerald-300/20'
+                }`}
               >
-                👍 Upvote Author
+                <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75 12 8.25l7.5 7.5" />
+                </svg>
+                Upvote Author
               </button>
               <button
                 type="button"
-                onClick={handleDownvote}
-                disabled={castVote.isPending}
-                className="rounded-full border border-red-300/30 bg-red-300/10 px-3 py-1.5 text-xs font-bold text-red-200 transition hover:bg-red-300/20 disabled:opacity-50"
+                onClick={() => handleVote(-1)}
+                disabled={castVote.isPending || removeVote.isPending}
+                aria-pressed={myVote.data === -1}
+                className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold text-red-200 transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                  myVote.data === -1
+                    ? 'border-red-300/60 bg-red-300/20'
+                    : 'border-red-300/30 bg-red-300/10 hover:bg-red-300/20'
+                }`}
               >
-                👎 Downvote Author
+                <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+                Downvote Author
               </button>
             </>
           )}
