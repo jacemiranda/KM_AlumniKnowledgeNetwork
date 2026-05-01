@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import type { PostFilters } from './post-service'
 import { FeedFilters } from './FeedFilters'
 import { PostCard } from './PostCard'
@@ -6,11 +7,20 @@ import { PostComposer } from './PostComposer'
 import { usePosts } from './use-posts'
 
 export function FeedPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [filters, setFilters] = useState<PostFilters>({ page: 1, limit: 20 })
   const [showComposer, setShowComposer] = useState(false)
   const { data, isLoading, error } = usePosts(filters)
   const posts = data?.posts ?? []
   const total = data?.total ?? 0
+
+  // Auto-open composer when navigated with ?compose=true
+  useEffect(() => {
+    if (searchParams.get('compose') === 'true') {
+      setShowComposer(true)
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams, setSearchParams])
 
   return (
     <div className="mx-auto flex w-full max-w-6xl gap-6">
