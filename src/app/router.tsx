@@ -10,6 +10,7 @@ import {
   NotificationsPage,
   PostDetailPage,
   ProfilePage,
+  SearchPage,
   SetupPage,
 } from '../pages'
 
@@ -27,7 +28,9 @@ export function AppRouter() {
           <Route element={<AppShell />}>
             <Route index element={<FeedPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:userId" element={<ProfilePage />} />
             <Route path="/alumni" element={<AlumniPage />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/post/:postId" element={<PostDetailPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />

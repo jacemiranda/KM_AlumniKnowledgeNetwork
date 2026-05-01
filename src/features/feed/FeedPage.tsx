@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { PostFilters } from './post-service'
 import { FeedFilters } from './FeedFilters'
@@ -10,23 +10,16 @@ export function FeedPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [filters, setFilters] = useState<PostFilters>({ page: 1, limit: 20 })
   const [showComposer, setShowComposer] = useState(false)
+  const isComposerOpen = showComposer || searchParams.get('compose') === 'true'
   const { data, isLoading, error } = usePosts(filters)
   const posts = data?.posts ?? []
   const total = data?.total ?? 0
-
-  // Auto-open composer when navigated with ?compose=true
-  useEffect(() => {
-    if (searchParams.get('compose') === 'true') {
-      setShowComposer(true)
-      setSearchParams({}, { replace: true })
-    }
-  }, [searchParams, setSearchParams])
 
   return (
     <div className="mx-auto flex w-full max-w-6xl gap-6">
       <section className="flex-1 space-y-5">
         {/* Toggle Composer */}
-        {!showComposer ? (
+        {!isComposerOpen ? (
           <button
             type="button"
             onClick={() => setShowComposer(true)}
@@ -35,7 +28,12 @@ export function FeedPage() {
             Share a practical insight, ask a question, or tag an alumni expert...
           </button>
         ) : (
-          <PostComposer onSuccess={() => setShowComposer(false)} />
+          <PostComposer
+            onSuccess={() => {
+              setShowComposer(false)
+              setSearchParams({}, { replace: true })
+            }}
+          />
         )}
 
         {/* Filters */}

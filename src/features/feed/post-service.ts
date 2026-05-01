@@ -26,6 +26,22 @@ export type PostWithRelations = PostRow & {
   comment_count: number
 }
 
+type PostAuthor = PostWithRelations['author']
+type PostField = PostWithRelations['field']
+type PostTag = PostWithRelations['post_tags'][number]
+type TaggedAlumni = NonNullable<PostWithRelations['tagged_alumni']>
+
+type RawPostWithRelations = PostRow & {
+  author: PostAuthor | PostAuthor[]
+  field: PostField | PostField[]
+  post_tags: PostTag[]
+  tagged_alumni: TaggedAlumni | TaggedAlumni[] | null
+}
+
+type QueryError = {
+  message: string
+}
+
 export type CreatePostInput = {
   title: string
   content: string
@@ -95,8 +111,11 @@ export async function fetchPosts(filters: PostFilters = {}) {
     query = query.in('id', ids)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error, count } = await query as { data: any[] | null; error: any; count: number | null }
+  const { data, error, count } = await query as {
+    data: RawPostWithRelations[] | null
+    error: QueryError | null
+    count: number | null
+  }
 
   if (error) {
     throw new Error(error.message)
@@ -117,15 +136,18 @@ export async function fetchPosts(filters: PostFilters = {}) {
 export async function fetchPostById(postId: string): Promise<PostWithRelations> {
   const supabase = getSupabaseClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await supabase
     .from('posts')
     .select(POST_SELECT)
     .eq('id', postId)
-    .single() as { data: any; error: any }
+    .single() as { data: RawPostWithRelations | null; error: QueryError | null }
 
   if (error) {
     throw new Error(error.message)
+  }
+
+  if (!data) {
+    throw new Error('Post not found.')
   }
 
   // Attach comment count
@@ -193,8 +215,7 @@ export async function deletePost(postId: string) {
  * Supabase returns FK joins as arrays for single relations.
  * This normalizes the raw row into our typed shape.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function normalizePost(raw: any): Omit<PostWithRelations, 'comment_count'> {
+function normalizePost(raw: RawPostWithRelations): Omit<PostWithRelations, 'comment_count'> {
   return {
     id: raw.id,
     author_id: raw.author_id,
