@@ -292,3 +292,65 @@ Reflection:
 - What helped? Kept changelog concise and verifiable.
 - What did you verify? No overstatement beyond branch deliverables.
 - What did you change manually? Final phrasing and placement.
+
+## Entry 11
+
+Date: 2026-05-01
+Sprint: Sprint 2 - Core Interaction
+PR: PR-04: Search Voting Architecture
+Tool / AI Used: Codex
+
+Prompt:
+
+```text
+Plan Sprint 2 PR-04 architecture documentation for search, voting, authority score, and profile metrics using the current dev branch as source of truth.
+```
+
+Output Used:
+
+- Proposed docs-only PR scope.
+- ADR boundary between search/alumni discovery and voting/profile metrics.
+- Verification checklist for documentation-only architecture work.
+
+Changes Made After Review:
+
+- Kept runtime code, schema, and UI files out of scope.
+- Treated ADR-0004 as the existing search/alumni discovery decision.
+- Added a separate ADR for voting authority and profile metrics.
+
+Reflection:
+
+- What helped? The plan kept PR-04 focused on architecture documentation instead of mixing feature work.
+- What did you verify? PR title, branch, target, and deliverable against `ROLE_PR_MAP.md`.
+- What did you change manually? Final ADR wording and changelog scope.
+
+## Entry 12
+
+Date: 2026-05-01
+Sprint: Sprint 2 - Core Interaction
+PR: PR-04: Search Voting Architecture
+Tool / AI Used: Codex
+
+Prompt:
+
+```text
+Draft a concise ADR and changelog entry for Sprint 2 voting authority and profile metrics decisions.
+```
+
+Output Used:
+
+- ADR structure using the accepted template.
+- Concise changelog wording for documentation artifacts.
+- Technical reflection notes for AI-assisted documentation work.
+
+Changes Made After Review:
+
+- Limited authority score claims to the existing votes table and helper-function architecture.
+- Avoided adding runtime implementation in this documentation PR.
+- Preserved MVP exclusions for private messaging, advanced analytics, and materialized authority automation.
+
+Reflection:
+
+- What helped? Fast conversion of implemented schema decisions into reviewable documentation.
+- What did you verify? ADR template compliance and consistency with MVP authority-score rules.
+- What did you change manually? Final phrasing for compute-on-read tradeoffs and deferred materialization.

@@ -33,6 +33,7 @@ All notable project changes should be recorded here.
   - Replaced the profile placeholder with signed-in and public profile metrics for authority score, posts created, tagged-in posts, and comments.
   - Added vote-state display, vote changing, and vote removal for profile and post-author voting flows.
   - Added focused tests for authority score computation, profile metrics loading, and profile route behavior.
+- Added Sprint 2 PR-04 architecture documentation for search, voting, authority score, and profile metrics decisions.
 
 ## Sprint 1 - Foundation
 
