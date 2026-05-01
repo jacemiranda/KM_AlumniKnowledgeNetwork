@@ -23,27 +23,46 @@ vi.mock('../lib/supabase', () => ({
       signInWithOAuth: vi.fn().mockResolvedValue({ error: null }),
       signOut: vi.fn().mockResolvedValue({ error: null }),
     },
-    from: vi.fn((table: string) => ({
-      select: vi.fn(() => {
-        if (table === 'profiles') {
-          return {
+    from: vi.fn((table: string) => {
+      if (table === 'profiles') {
+        return {
+          select: vi.fn(() => ({
             eq: vi.fn(() => ({
               maybeSingle: vi.fn().mockResolvedValue({
                 data: currentProfile,
                 error: null,
               }),
             })),
-          }
+          })),
         }
+      }
 
-        return {
+      if (table === 'posts') {
+        const chainable = {
+          select: vi.fn(() => chainable),
+          eq: vi.fn(() => chainable),
+          in: vi.fn(() => chainable),
+          order: vi.fn(() => chainable),
+          range: vi.fn(() => chainable),
+          single: vi.fn().mockResolvedValue({ data: null, error: null }),
+          then: vi.fn((resolve: (v: unknown) => void) =>
+            resolve({ data: [], error: null, count: 0 }),
+          ),
+        }
+        return chainable
+      }
+
+      // Default for fields, skills, tags, etc.
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(function (this: unknown) { return this || { order: vi.fn().mockResolvedValue({ data: [], error: null }) } }),
           order: vi.fn().mockResolvedValue({
             data: [],
             error: null,
           }),
-        }
-      }),
-    })),
+        })),
+      }
+    }),
   }),
 }))
 
@@ -86,7 +105,7 @@ describe('App Supabase auth flow', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText(/share a practical insight/i)).toBeInTheDocument()
+      expect(screen.getByText(/share a practical insight/i)).toBeInTheDocument()
     })
     expect(screen.getByText(/casey diaz/i)).toBeInTheDocument()
   })

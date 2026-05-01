@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
 
 const shellLinks = [
@@ -11,6 +11,7 @@ const shellLinks = [
 
 export function AppShell() {
   const { session, signOut } = useAuth()
+  const navigate = useNavigate()
 
   if (!session) {
     return null
@@ -50,7 +51,10 @@ export function AppShell() {
             ))}
           </nav>
 
-          <button className="mt-6 w-full rounded-full border border-emerald-300/40 bg-emerald-300/15 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-100">
+          <button
+            onClick={() => navigate('/?compose=true')}
+            className="mt-6 w-full rounded-full border border-emerald-300/40 bg-emerald-300/15 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-100"
+          >
             Create Post
           </button>
         </aside>

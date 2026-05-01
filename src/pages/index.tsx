@@ -1,4 +1,5 @@
 import { FeedPage as FeedFeaturePage } from '../features/feed/FeedPage'
+import { PostDetail } from '../features/feed/PostDetail'
 import { SetupPage as SetupFeaturePage } from '../features/setup/SetupPage'
 
 type PlaceholderPageProps = {
@@ -22,6 +23,10 @@ export function FeedPage() {
 
 export function SetupPage() {
   return <SetupFeaturePage />
+}
+
+export function PostDetailPage() {
+  return <PostDetail />
 }
 
 export function ProfilePage() {

@@ -8,6 +8,7 @@ import {
   FeedPage,
   LeaderboardPage,
   NotificationsPage,
+  PostDetailPage,
   ProfilePage,
   SetupPage,
 } from '../pages'
@@ -27,6 +28,7 @@ export function AppRouter() {
             <Route index element={<FeedPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/alumni" element={<AlumniPage />} />
+            <Route path="/post/:postId" element={<PostDetailPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
           </Route>
