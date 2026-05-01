@@ -21,12 +21,14 @@ describe('Sprint 1 PR-02 schema migrations', () => {
     'posts',
     'tags',
     'post_tags',
+    'comments',
+    'votes',
   ])('creates the %s table', (tableName) => {
     expect(migrationSql).toContain(`create table if not exists public.${tableName}`);
   });
 
-  it.each(['comments', 'votes', 'badges', 'user_badges', 'notifications'])(
-    'leaves the later-sprint %s table out of PR-02',
+  it.each(['badges', 'user_badges', 'notifications'])(
+    'leaves the later-sprint %s table out of current migrations',
     (tableName) => {
       expect(migrationSql).not.toContain(
         `create table if not exists public.${tableName}`,
