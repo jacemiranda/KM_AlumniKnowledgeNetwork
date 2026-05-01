@@ -1,10 +1,12 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
+import { SearchBar } from '../search/SearchBar'
 
 const shellLinks = [
   { to: '/', label: 'Feed' },
-  { to: '/profile', label: 'Profile' },
+  { to: '/search', label: 'Search' },
   { to: '/alumni', label: 'Alumni' },
+  { to: '/profile', label: 'Profile' },
   { to: '/leaderboard', label: 'Leaderboard' },
   { to: '/notifications', label: 'Notifications' },
 ]
@@ -28,13 +30,18 @@ export function AppShell() {
         <aside className="hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-liquid backdrop-blur-2xl md:sticky md:top-6 md:block md:h-[calc(100vh-3rem)]">
           <div className="border-b border-white/10 pb-5">
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Alumni Knowledge Network</p>
-            <h1 className="mt-2 text-2xl font-black tracking-tight text-white">EraLink Feed Shell</h1>
+            <h1 className="mt-2 text-2xl font-black tracking-tight text-white">EraLink</h1>
             <p className="mt-3 text-sm text-slate-300">
-              OAuth entry, profile setup, and feed-first navigation for Sprint 1.
+              Knowledge sharing through feed, search, and alumni discovery.
             </p>
           </div>
 
-          <nav aria-label="Primary" className="mt-6 grid gap-2">
+          {/* Sidebar Search */}
+          <div className="mt-4">
+            <SearchBar compact navigateOnSubmit placeholder="Quick search..." />
+          </div>
+
+          <nav aria-label="Primary" className="mt-4 grid gap-2">
             {shellLinks.map((link) => (
               <NavLink
                 key={link.to}
@@ -43,7 +50,7 @@ export function AppShell() {
                 className={({ isActive }) =>
                   isActive
                     ? 'rounded-2xl border border-emerald-300/40 bg-emerald-300/15 px-4 py-3 text-sm font-bold text-emerald-100'
-                    : 'rounded-2xl border border-transparent bg-white/5 px-4 py-3 text-sm text-slate-300 transition hover:border-white/10 hover:text-slate-100'
+                    : 'rounded-2xl border border-transparent bg-white/5 px-4 py-3 text-sm text-slate-300 transition hover:border-white/10 hover:text-slate-100 cursor-pointer'
                 }
               >
                 {link.label}
@@ -53,7 +60,7 @@ export function AppShell() {
 
           <button
             onClick={() => navigate('/?compose=true')}
-            className="mt-6 w-full rounded-full border border-emerald-300/40 bg-emerald-300/15 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-100"
+            className="mt-6 w-full rounded-full border border-emerald-300/40 bg-emerald-300/15 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-100 cursor-pointer"
           >
             Create Post
           </button>
@@ -71,7 +78,7 @@ export function AppShell() {
               </div>
 
               <button
-                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-200 transition hover:border-white/30 hover:bg-white/10"
+                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-200 transition hover:border-white/30 hover:bg-white/10 cursor-pointer"
                 onClick={signOut}
                 type="button"
               >
@@ -86,7 +93,7 @@ export function AppShell() {
         </main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 gap-1 border-t border-white/10 bg-ink-950/95 p-2 backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-6 gap-1 border-t border-white/10 bg-ink-950/95 p-2 backdrop-blur md:hidden">
         {shellLinks.map((link) => (
           <NavLink
             key={link.to}

@@ -21,6 +21,16 @@ export type CommentWithAuthor = CommentRow & {
   }
 }
 
+type CommentAuthor = CommentWithAuthor['author']
+
+type RawCommentWithAuthor = CommentRow & {
+  author: CommentAuthor | CommentAuthor[]
+}
+
+type QueryError = {
+  message: string
+}
+
 // ── Queries ────────────────────────────────────────────────────────────
 
 const COMMENT_SELECT = `
@@ -37,13 +47,15 @@ const COMMENT_SELECT = `
 export async function fetchComments(postId: string): Promise<CommentWithAuthor[]> {
   const supabase = getSupabaseClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await supabase
     .from('comments')
     .select(COMMENT_SELECT)
     .eq('post_id', postId)
     .eq('status', 'published')
-    .order('created_at', { ascending: true }) as { data: any[] | null; error: any }
+    .order('created_at', { ascending: true }) as {
+      data: RawCommentWithAuthor[] | null
+      error: QueryError | null
+    }
 
   if (error) {
     throw new Error(error.message)
@@ -53,7 +65,7 @@ export async function fetchComments(postId: string): Promise<CommentWithAuthor[]
   return (data ?? []).map((row) => ({
     ...row,
     author: Array.isArray(row.author) ? row.author[0] : row.author,
-  })) as CommentWithAuthor[]
+  }))
 }
 
 export async function createComment(

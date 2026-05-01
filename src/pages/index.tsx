@@ -1,5 +1,7 @@
+import { AlumniPage as AlumniFeaturePage } from '../features/alumni/AlumniPage'
 import { FeedPage as FeedFeaturePage } from '../features/feed/FeedPage'
 import { PostDetail } from '../features/feed/PostDetail'
+import { SearchPage as SearchFeaturePage } from '../features/search/SearchPage'
 import { SetupPage as SetupFeaturePage } from '../features/setup/SetupPage'
 
 type PlaceholderPageProps = {
@@ -29,20 +31,19 @@ export function PostDetailPage() {
   return <PostDetail />
 }
 
+export function SearchPage() {
+  return <SearchFeaturePage />
+}
+
+export function AlumniPage() {
+  return <AlumniFeaturePage />
+}
+
 export function ProfilePage() {
   return (
     <PlaceholderPage
       title="Profile"
       description="Profile setup and contribution details are intentionally out of scope for this scaffold PR."
-    />
-  )
-}
-
-export function AlumniPage() {
-  return (
-    <PlaceholderPage
-      title="Alumni / Mentors"
-      description="Dedicated alumni discovery will be connected in a later PR once search and profile data are available."
     />
   )
 }

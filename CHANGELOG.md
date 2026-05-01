@@ -20,6 +20,15 @@ All notable project changes should be recorded here.
   - New components: PostComposer, PostCard, PostDetail, CommentThread, FeedFilters.
   - Added `/post/:postId` route for post detail with comments thread and author voting.
   - Updated schema migration tests and App integration test for Sprint 2 changes.
+- Added Sprint 2 PR-02: Search and Alumni Discovery.
+  - Database migration 003: `search_vector` tsvector generated columns on `profiles` and `posts` with GIN indexes; `compute_authority_score`, `count_user_posts`, `count_user_comments`, and `count_tagged_in_posts` helper functions.
+  - Service layer: `search-service` (searchUsers, searchPosts, searchAll) and `alumni-service` (fetchAlumni, fetchAlumniProfile) with full-text search and bulk metrics computation.
+  - TanStack Query hooks: `useSearchUsers`, `useSearchPosts`, `useAlumni`, `useAlumniProfile`.
+  - New SearchPage with debounced input, tabbed results (All/People/Posts), URL param sync, and inline PostResultCard.
+  - New AlumniPage with field/skill filters, sort controls (authority/alphabetical/recent), alumni card grid, and pagination.
+  - Reusable SearchBar component integrated into AppShell sidebar.
+  - Added `/search` and `/profile/:userId` routes.
+  - ADR-0004: Search and Alumni Discovery Architecture.
 
 ## Sprint 1 - Foundation
 

@@ -55,7 +55,7 @@ export async function findOrCreateTags(names: string[]): Promise<string[]> {
   // Insert missing tags
   const toInsert = trimmed
     .filter((_, i) => !existingSlugs.has(slugs[i]))
-    .map((name, i) => ({
+    .map((name) => ({
       name,
       slug: slugs[trimmed.indexOf(name)] ?? toSlug(name),
     }))
