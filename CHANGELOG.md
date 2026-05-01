@@ -29,6 +29,10 @@ All notable project changes should be recorded here.
   - Reusable SearchBar component integrated into AppShell sidebar.
   - Added `/search` and `/profile/:userId` routes.
   - ADR-0004: Search and Alumni Discovery Architecture.
+- Added Sprint 2 PR-03: Voting Authority and Profile Metrics.
+  - Replaced the profile placeholder with signed-in and public profile metrics for authority score, posts created, tagged-in posts, and comments.
+  - Added vote-state display, vote changing, and vote removal for profile and post-author voting flows.
+  - Added focused tests for authority score computation, profile metrics loading, and profile route behavior.
 
 ## Sprint 1 - Foundation
 

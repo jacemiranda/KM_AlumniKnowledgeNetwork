@@ -1,6 +1,38 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { useAuth } from '../auth/use-auth'
-import { castVote, removeVote, type VoteValue } from './vote-service'
+import { ALUMNI_KEYS } from '../alumni/use-alumni'
+import { PROFILE_KEYS } from '../profile/use-profile-metrics'
+import { SEARCH_KEYS } from '../search/use-search'
+import { castVote, fetchMyVote, removeVote, type VoteValue } from './vote-service'
+import { POST_KEYS } from './use-posts'
+
+export const VOTE_KEYS = {
+  all: ['votes'] as const,
+  mine: (voterId: string | null, targetId: string) =>
+    ['votes', 'mine', voterId, targetId] as const,
+}
+
+function invalidateVoteConsumers(queryClient: QueryClient) {
+  void queryClient.invalidateQueries({ queryKey: VOTE_KEYS.all })
+  void queryClient.invalidateQueries({ queryKey: POST_KEYS.all })
+  void queryClient.invalidateQueries({ queryKey: PROFILE_KEYS.all })
+  void queryClient.invalidateQueries({ queryKey: ALUMNI_KEYS.all })
+  void queryClient.invalidateQueries({ queryKey: SEARCH_KEYS.all })
+}
+
+export function useMyVote(targetId: string) {
+  const { session } = useAuth()
+  const voterId = session?.user.id ?? null
+
+  return useQuery({
+    queryKey: VOTE_KEYS.mine(voterId, targetId),
+    queryFn: () => {
+      if (!voterId) throw new Error('Must be signed in to load vote.')
+      return fetchMyVote(voterId, targetId)
+    },
+    enabled: !!voterId && !!targetId && voterId !== targetId,
+  })
+}
 
 export function useCastVote() {
   const queryClient = useQueryClient()
@@ -12,8 +44,7 @@ export function useCastVote() {
       return castVote(session.user.id, targetId, value)
     },
     onSuccess: () => {
-      // Invalidate post queries so vote-related data refreshes
-      void queryClient.invalidateQueries({ queryKey: ['posts'] })
+      invalidateVoteConsumers(queryClient)
     },
   })
 }
@@ -28,7 +59,7 @@ export function useRemoveVote() {
       return removeVote(session.user.id, targetId)
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['posts'] })
+      invalidateVoteConsumers(queryClient)
     },
   })
 }

@@ -1,6 +1,7 @@
 import { AlumniPage as AlumniFeaturePage } from '../features/alumni/AlumniPage'
 import { FeedPage as FeedFeaturePage } from '../features/feed/FeedPage'
 import { PostDetail } from '../features/feed/PostDetail'
+import { ProfilePage as ProfileFeaturePage } from '../features/profile/ProfilePage'
 import { SearchPage as SearchFeaturePage } from '../features/search/SearchPage'
 import { SetupPage as SetupFeaturePage } from '../features/setup/SetupPage'
 
@@ -40,12 +41,7 @@ export function AlumniPage() {
 }
 
 export function ProfilePage() {
-  return (
-    <PlaceholderPage
-      title="Profile"
-      description="Profile setup and contribution details are intentionally out of scope for this scaffold PR."
-    />
-  )
+  return <ProfileFeaturePage />
 }
 
 export function LeaderboardPage() {
