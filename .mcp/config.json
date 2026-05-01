@@ -1,23 +1,11 @@
 {
     "mcpServers": {
         "StitchMCP": {
-            "command": "npx",
+            "command": "node",
             "args": [
-                "dotenv-cli",
-                "-e",
-                ".env.local",
-                "--",
-                "npx",
-                "-y",
-                "mcp-remote",
-                "https://stitch.googleapis.com/mcp",
-                "--header",
-                "X-Goog-Api-Key: ${STITCH_API_KEY}"
+                ".mcp/start-mcp.js"
             ],
-            "env": {
-                "STITCH_API_KEY": "${STITCH_API_KEY}",
-                "STITCH_PROJECT_ID": "${STITCH_PROJECT_ID}"
-            }
+            "disabled": false
         }
     }
 }
