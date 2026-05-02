@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EraLink | Search</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          background: '#0b1326',
+          'on-background': '#dae2fd',
+          surface: '#0b1326',
+          'surface-container-low': '#131b2e',
+          'surface-container': '#171f33',
+          'surface-container-high': '#222a3d',
+          'surface-container-highest': '#2d3449',
+          primary: '#4edea3',
+          secondary: '#ffb95f',
+          'on-surface': '#dae2fd',
+          'on-surface-variant': '#bbcabf',
+        },
+        boxShadow: {
+          liquid: '0 20px 40px -18px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.02)'
+        },
+        borderRadius: {
+          xl: '1rem',
+          '2xl': '1.5rem',
+          '3xl': '2rem',
+          full: '9999px',
+        },
+        fontFamily: {
+          body: ['Plus Jakarta Sans'],
+        }
+      }
+    }
+  }
+</script>
+</head>
+<body class="min-h-screen bg-background font-body text-on-background">
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+  <div class="absolute -left-16 top-0 h-80 w-80 rounded-full bg-primary/10 blur-[120px]"></div>
+  <div class="absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-secondary/10 blur-[120px]"></div>
+</div>
+<main class="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+  <section class="rounded-[32px] border border-white/10 bg-[#131b2e]/60 p-4 shadow-liquid backdrop-blur-2xl md:p-6">
+    <div class="space-y-4">
+      <div class="space-y-2">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-200">Discover</p>
+        <h1 class="text-2xl font-black tracking-tight text-white md:text-3xl">Search people, posts, and topics</h1>
+        <p class="max-w-2xl text-sm leading-relaxed text-slate-400 md:text-[15px]">Find alumni, knowledge posts, fields, tags, and skills with one focused query.</p>
+      </div>
+      <div class="relative w-full">
+        <svg class="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+        </svg>
+        <input class="w-full rounded-[28px] border border-white/10 bg-black/20 py-4 pl-11 pr-4 text-base text-slate-100 shadow-liquid placeholder:text-slate-500 focus:border-emerald-300/40 focus:outline-none focus:ring-1 focus:ring-emerald-300/30" placeholder="Search by name, field, tags, skills..." value="react" />
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button class="rounded-full border border-[#4edea3]/30 bg-[#4edea3]/20 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[#4edea3]">All</button>
+        <button class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-slate-400">Posts</button>
+        <button class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-slate-400">Alumni</button>
+        <button class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-slate-400">Tags</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-[32px] border border-white/10 bg-[#131b2e]/60 p-5 shadow-liquid backdrop-blur-2xl">
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <a href="#" class="group flex h-full items-start gap-4 rounded-[28px] border border-white/10 bg-[#131b2e]/60 p-4 shadow-liquid transition hover:border-emerald-300/20 hover:bg-white/[0.08]">
+        <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400/30 to-cyan-400/30 text-sm font-bold text-emerald-100 ring-2 ring-white/10">AA</div>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2">
+            <h3 class="truncate text-sm font-bold text-white transition-colors group-hover:text-emerald-100">Avery Alumni</h3>
+            <span class="inline-flex items-center rounded-full bg-emerald-400/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300">alumni</span>
+          </div>
+          <p class="mt-0.5 text-xs text-slate-400">Software Development</p>
+          <p class="mt-1 line-clamp-2 text-xs text-slate-400">Frontend mentor</p>
+          <div class="mt-2 flex flex-wrap gap-1.5">
+            <span class="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-slate-400">React</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="#" class="group flex h-full flex-col rounded-[28px] border border-white/10 bg-[#131b2e]/60 p-4 shadow-liquid transition hover:border-emerald-300/20 hover:bg-white/[0.08]">
+        <div class="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <span class="rounded-full bg-amber-300/15 px-2 py-0.5 text-amber-100">question</span>
+          <span>•</span>
+          <span>Software Development</span>
+        </div>
+        <h3 class="mt-3 text-sm font-extrabold tracking-tight text-white transition group-hover:text-emerald-100">React study group</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-300">Sharing a practical insight for the next cohort.</p>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <span class="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-slate-300">React</span>
+        </div>
+      </a>
+    </div>
+  </section>
+</main>
+</body>
+</html>

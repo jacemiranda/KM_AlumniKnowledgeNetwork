@@ -12,6 +12,8 @@ type SearchBarProps = {
   navigateOnSubmit?: boolean
   /** Compact variant for the header */
   compact?: boolean
+  /** Extra Tailwind classes appended to the input */
+  inputClassName?: string
 }
 
 /**
@@ -24,6 +26,7 @@ function SearchBarInner({
   placeholder = 'Search people, posts, fields, skills...',
   navigateOnSubmit = false,
   compact = false,
+  inputClassName = '',
 }: SearchBarProps) {
   const [value, setValue] = useState(initialQuery)
   const navigate = useNavigate()
@@ -85,7 +88,7 @@ function SearchBarInner({
             compact
               ? 'rounded-xl py-2 text-sm'
               : 'rounded-2xl py-3 text-base shadow-liquid'
-          }`}
+          } ${inputClassName}`}
         />
 
         {value.trim() && (
