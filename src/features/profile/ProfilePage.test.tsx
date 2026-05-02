@@ -7,6 +7,8 @@ const mockUseAuth = vi.fn()
 const mockUseProfileMetrics = vi.fn()
 const mockUseCastVote = vi.fn()
 const mockUseRemoveVote = vi.fn()
+const mockUseUserBadges = vi.fn()
+const mockUseCheckBadges = vi.fn()
 
 vi.mock('../auth/use-auth', () => ({
   useAuth: () => mockUseAuth(),
@@ -19,6 +21,11 @@ vi.mock('./use-profile-metrics', () => ({
 vi.mock('../feed/use-votes', () => ({
   useCastVote: () => mockUseCastVote(),
   useRemoveVote: () => mockUseRemoveVote(),
+}))
+
+vi.mock('../badges/use-badges', () => ({
+  useUserBadges: () => mockUseUserBadges(),
+  useCheckBadges: () => mockUseCheckBadges(),
 }))
 
 function profile(overrides = {}) {
@@ -73,6 +80,8 @@ describe('ProfilePage', () => {
     })
     mockUseCastVote.mockReturnValue({ mutate: vi.fn(), isPending: false })
     mockUseRemoveVote.mockReturnValue({ mutate: vi.fn(), isPending: false })
+    mockUseUserBadges.mockReturnValue({ data: [], isLoading: false })
+    mockUseCheckBadges.mockReturnValue({ mutate: vi.fn() })
   })
 
   it('uses the signed-in user id for /profile', () => {

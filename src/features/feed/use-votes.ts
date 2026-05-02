@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { useAuth } from '../auth/use-auth'
 import { ALUMNI_KEYS } from '../alumni/use-alumni'
+import { BADGE_KEYS } from '../badges/use-badges'
+import { LEADERBOARD_KEYS } from '../leaderboard/use-leaderboard'
 import { PROFILE_KEYS } from '../profile/use-profile-metrics'
 import { SEARCH_KEYS } from '../search/use-search'
 import { castVote, fetchMyVote, removeVote, type VoteValue } from './vote-service'
@@ -18,6 +20,8 @@ function invalidateVoteConsumers(queryClient: QueryClient) {
   void queryClient.invalidateQueries({ queryKey: PROFILE_KEYS.all })
   void queryClient.invalidateQueries({ queryKey: ALUMNI_KEYS.all })
   void queryClient.invalidateQueries({ queryKey: SEARCH_KEYS.all })
+  void queryClient.invalidateQueries({ queryKey: LEADERBOARD_KEYS.all })
+  void queryClient.invalidateQueries({ queryKey: BADGE_KEYS.all })
 }
 
 export function useMyVote(targetId: string) {

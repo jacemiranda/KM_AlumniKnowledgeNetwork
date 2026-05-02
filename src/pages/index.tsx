@@ -1,6 +1,7 @@
 import { AlumniPage as AlumniFeaturePage } from '../features/alumni/AlumniPage'
 import { FeedPage as FeedFeaturePage } from '../features/feed/FeedPage'
 import { PostDetail } from '../features/feed/PostDetail'
+import { LeaderboardPage as LeaderboardFeaturePage } from '../features/leaderboard/LeaderboardPage'
 import { ProfilePage as ProfileFeaturePage } from '../features/profile/ProfilePage'
 import { SearchPage as SearchFeaturePage } from '../features/search/SearchPage'
 import { SetupPage as SetupFeaturePage } from '../features/setup/SetupPage'
@@ -45,12 +46,7 @@ export function ProfilePage() {
 }
 
 export function LeaderboardPage() {
-  return (
-    <PlaceholderPage
-      title="Leaderboard"
-      description="Authority ranking and badges are future sprint work. This route exists now to validate shell navigation."
-    />
-  )
+  return <LeaderboardFeaturePage />
 }
 
 export function NotificationsPage() {
@@ -61,3 +57,4 @@ export function NotificationsPage() {
     />
   )
 }
+

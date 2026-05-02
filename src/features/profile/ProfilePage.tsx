@@ -1,5 +1,8 @@
+import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
+import { BadgeDisplay } from '../badges/BadgeDisplay'
+import { useUserBadges, useCheckBadges } from '../badges/use-badges'
 import { useCastVote, useRemoveVote } from '../feed/use-votes'
 import type { VoteValue } from '../feed/vote-service'
 import { useProfileMetrics } from './use-profile-metrics'
@@ -53,8 +56,18 @@ export function ProfilePage() {
   const { session } = useAuth()
   const profileId = userId ?? session?.user.id ?? ''
   const { data: profile, isLoading, error } = useProfileMetrics(profileId)
+  const { data: userBadges } = useUserBadges(profileId)
+  const checkBadges = useCheckBadges()
   const castVote = useCastVote()
   const removeVote = useRemoveVote()
+
+  // Auto-check and award eligible badges when profile loads
+  useEffect(() => {
+    if (profileId && profile) {
+      checkBadges.mutate(profileId)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileId, profile?.id])
 
   if (!session) {
     return null
@@ -190,6 +203,16 @@ export function ProfilePage() {
           <MetricCard label="Tagged in posts" value={profile.posts_tagged_in} />
           <MetricCard label="Comments" value={profile.comment_count} />
         </div>
+
+        {/* Earned badges */}
+        {(userBadges ?? []).length > 0 && (
+          <div className="border-t border-white/10 p-6 sm:p-8">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">
+              Earned Badges
+            </p>
+            <BadgeDisplay badges={userBadges ?? []} />
+          </div>
+        )}
       </section>
     </div>
   )

@@ -4,6 +4,18 @@ All notable project changes should be recorded here.
 
 ## Unreleased
 
+- Added Sprint 3 PR-01: Badges, Leaderboard, and Analytics.
+  - Database migration 004: `badges` and `user_badges` tables with RLS policies, `check_and_award_badges()` auto-award function, `platform_analytics()` stats function, and 16 Tier 1 badge seed definitions.
+  - Badge service, leaderboard service, and analytics service with TanStack Query hooks.
+  - LeaderboardPage with top-3 podium cards, ranked table, field filter, and pagination.
+  - BadgeDisplay component with category-colored chips and inline SVG icons.
+  - AnalyticsSummary component for Admin/Moderator showing platform-wide metrics.
+  - Profile page now displays earned badges and auto-checks for new badge eligibility.
+  - Alumni cards show top 3 earned badges.
+  - Vote mutations now invalidate leaderboard and badge caches.
+  - ADR-0006: Badges, Leaderboard, and Basic Analytics.
+  - Updated schema migration tests for Sprint 3 tables and functions.
+
 - Revised the MVP from mentor-request and messaging workflows to a feed, comments, voting, leaderboard, and moderation model.
 - Added revised AI context pack and source-of-truth markdown files.
 - Added the Sprint 1 project scaffold with TypeScript app structure, protected shell routing, and a development-only mock OAuth session flow.

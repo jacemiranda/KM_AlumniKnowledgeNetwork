@@ -12,7 +12,7 @@ const migrationSql = migrationFiles
   .join('\n')
   .toLowerCase();
 
-describe('Sprint 1 PR-02 schema migrations', () => {
+describe('Schema migrations', () => {
   it.each([
     'profiles',
     'fields',
@@ -27,7 +27,16 @@ describe('Sprint 1 PR-02 schema migrations', () => {
     expect(migrationSql).toContain(`create table if not exists public.${tableName}`);
   });
 
-  it.each(['badges', 'user_badges', 'notifications'])(
+  it.each(['badges', 'user_badges'])(
+    'creates the Sprint 3 %s table',
+    (tableName) => {
+      expect(migrationSql).toContain(
+        `create table if not exists public.${tableName}`,
+      );
+    },
+  );
+
+  it.each(['notifications'])(
     'leaves the later-sprint %s table out of current migrations',
     (tableName) => {
       expect(migrationSql).not.toContain(
@@ -36,11 +45,15 @@ describe('Sprint 1 PR-02 schema migrations', () => {
     },
   );
 
-  it('does not include later-sprint leaderboard, analytics, voting, or badge automation', () => {
+  it('includes Sprint 3 badge and analytics automation', () => {
+    expect(migrationSql).toContain('check_and_award_badges');
+    expect(migrationSql).toContain('platform_analytics');
+  });
+
+  it('does not include later-sprint features', () => {
     expect(migrationSql).not.toContain('v_user_authority_leaderboard');
     expect(migrationSql).not.toContain('v_basic_platform_analytics');
     expect(migrationSql).not.toContain('refresh_profile_authority_score');
-    expect(migrationSql).not.toContain('award_eligible_badges');
   });
 
   it('allows first-time OAuth profiles to exist before setup completion', () => {
