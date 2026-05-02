@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
+    "verify:deploy": "npm run lint && npm test && npm run build",
     "test:watch": "vitest"
   },
   "dependencies": {

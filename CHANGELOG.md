@@ -4,6 +4,11 @@ All notable project changes should be recorded here.
 
 ## Unreleased
 
+- Added Sprint 3 PR-03: Deploy and Hardening Revised.
+  - Added Vercel deployment config with Vite build settings and SPA route rewrites.
+  - Added `npm run verify:deploy` for lint, tests, and production build verification.
+  - Added Supabase URL validation, deployment README notes, and ADR-0008.
+
 - Added Sprint 3 PR-02: Moderation and User Management.
   - Database migration 005: `moderation_log` table, `is_admin()` helper, `auto_promote_admin` trigger, and default admin seeding for `sanchezjm76@gmail.com` and `jcesperanza@neu.edu.ph`.
   - Moderation service with user blocking/unblocking, post/comment hide/remove/restore, role assignment, field toggles, badge award/revoke, and audit logging.

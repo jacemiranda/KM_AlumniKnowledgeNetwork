@@ -99,6 +99,23 @@ STITCH_PROJECT_ID=
 
 Never commit real secrets.
 
+## Deployment Verification
+
+Vercel is the MVP deployment target. Configure these variables in the Vercel project before deploying:
+
+```bash
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+```
+
+Run the release verification command before opening or updating the deployment PR:
+
+```bash
+npm run verify:deploy
+```
+
+This runs lint, Vitest, and the production Vite build. The repository includes `vercel.json` so Vercel builds with `npm run build`, publishes `dist`, and rewrites direct route requests back to `index.html`.
+
 ## Team AI Setup (StitchMCP)
 
 This project uses **StitchMCP** for UI generation and design automation. To ensure all team members have access to the same design workspace:

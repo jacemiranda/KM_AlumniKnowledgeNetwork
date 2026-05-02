@@ -324,6 +324,36 @@ Reflection:
 - What did you verify? PR title, branch, target, and deliverable against `ROLE_PR_MAP.md`.
 - What did you change manually? Final ADR wording and changelog scope.
 
+## Entry 13
+
+Date: 2026-05-02
+Sprint: Sprint 3 - Final Release
+PR: PR-03: Deploy and Hardening Revised
+Tool / AI Used: Codex
+
+Prompt:
+
+```text
+Read AGENTS.md first. I am M2 Full Stack Developer / Technical Lead. Work on Sprint 3 PR-03 from docs/project/ROLE_PR_MAP.md. Implement only this PR and draft the matching CHANGELOG.md entry.
+```
+
+Output Used:
+
+- Deployment hardening scope based on ROLE_PR_MAP, sprint deliverables, MVP, and tech stack docs.
+- Verification script, Vercel config, Supabase config validation, and deployment ADR outline.
+
+Changes Made After Review:
+
+- Kept changes limited to deployment readiness and integration hardening.
+- Verified branch name, PR title, target branch, and PR template requirements.
+- Added a short changelog entry based only on completed branch work.
+
+Reflection:
+
+- What helped? The source-of-truth docs kept the PR from drifting into new feature work.
+- What did you verify? Test, lint, and build baseline before hardening changes.
+- What did you change manually? Final code, config, ADR, README, and changelog wording.
+
 ## Entry 12
 
 Date: 2026-05-01
