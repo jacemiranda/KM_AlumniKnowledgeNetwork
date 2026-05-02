@@ -50,6 +50,14 @@ describe('Schema migrations', () => {
     expect(migrationSql).toContain('platform_analytics');
   });
 
+  it('creates the moderation_log table', () => {
+    expect(migrationSql).toContain('create table if not exists public.moderation_log');
+  });
+
+  it('includes admin auto-promote trigger', () => {
+    expect(migrationSql).toContain('auto_promote_admin');
+  });
+
   it('does not include later-sprint features', () => {
     expect(migrationSql).not.toContain('v_user_authority_leaderboard');
     expect(migrationSql).not.toContain('v_basic_platform_analytics');

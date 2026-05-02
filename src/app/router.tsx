@@ -12,6 +12,7 @@ import {
   ProfilePage,
   SearchPage,
   SetupPage,
+  UserManagementPage,
 } from '../pages'
 
 export function AppRouter() {
@@ -34,6 +35,7 @@ export function AppRouter() {
             <Route path="/post/:postId" element={<PostDetailPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/admin" element={<UserManagementPage />} />
           </Route>
           </Route>
         </Route>

@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
 import { SearchBar } from '../search/SearchBar'
 
-const shellLinks = [
+const baseLinks = [
   { to: '/', label: 'Feed' },
   { to: '/search', label: 'Search' },
   { to: '/alumni', label: 'Alumni' },
@@ -14,6 +14,10 @@ const shellLinks = [
 export function AppShell() {
   const { session, signOut } = useAuth()
   const navigate = useNavigate()
+  const role = session?.user.role
+  const shellLinks = role === 'admin' || role === 'moderator'
+    ? [...baseLinks, { to: '/admin', label: 'Admin' }]
+    : baseLinks
 
   if (!session) {
     return null
@@ -93,7 +97,7 @@ export function AppShell() {
         </main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-6 gap-1 border-t border-white/10 bg-ink-950/95 p-2 backdrop-blur md:hidden">
+      <nav className={`fixed inset-x-0 bottom-0 z-20 grid gap-1 border-t border-white/10 bg-ink-950/95 p-2 backdrop-blur md:hidden`} style={{ gridTemplateColumns: `repeat(${shellLinks.length}, minmax(0, 1fr))` }}>
         {shellLinks.map((link) => (
           <NavLink
             key={link.to}
