@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom'
 import type { AlumniListItem } from './alumni-service'
+import { BadgeDisplay } from '../badges/BadgeDisplay'
+import { useUserBadges } from '../badges/use-badges'
 
 type AlumniCardProps = {
   alumni: AlumniListItem
 }
 
 export function AlumniCard({ alumni }: AlumniCardProps) {
+  const { data: userBadges } = useUserBadges(alumni.id)
   const initials = alumni.name
     .split(' ')
     .map((w) => w[0])
@@ -63,6 +66,13 @@ export function AlumniCard({ alumni }: AlumniCardProps) {
               +{alumni.skills.length - 4}
             </span>
           )}
+        </div>
+      )}
+
+      {/* Badges */}
+      {(userBadges ?? []).length > 0 && (
+        <div className="mt-3">
+          <BadgeDisplay badges={userBadges ?? []} compact maxVisible={3} />
         </div>
       )}
 
