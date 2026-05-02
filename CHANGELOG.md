@@ -4,6 +4,16 @@ All notable project changes should be recorded here.
 
 ## Unreleased
 
+- Added Sprint 3 PR-02: Moderation and User Management.
+  - Database migration 005: `moderation_log` table, `is_admin()` helper, `auto_promote_admin` trigger, and default admin seeding for `sanchezjm76@gmail.com` and `jcesperanza@neu.edu.ph`.
+  - Moderation service with user blocking/unblocking, post/comment hide/remove/restore, role assignment, field toggles, badge award/revoke, and audit logging.
+  - TanStack Query hooks for all moderation operations.
+  - UserManagementPage with 5 tabs: Users, Content, Fields, Analytics, and Moderation Log.
+  - Admin nav link conditionally visible for Admin/Moderator roles.
+  - `/admin` route added to the app router.
+  - ADR-0007: Moderation and User Management.
+  - Updated schema migration tests.
+
 - Added Sprint 3 PR-01: Badges, Leaderboard, and Analytics.
   - Database migration 004: `badges` and `user_badges` tables with RLS policies, `check_and_award_badges()` auto-award function, `platform_analytics()` stats function, and 16 Tier 1 badge seed definitions.
   - Badge service, leaderboard service, and analytics service with TanStack Query hooks.
