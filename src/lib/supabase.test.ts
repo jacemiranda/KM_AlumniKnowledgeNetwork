@@ -22,4 +22,13 @@ describe('Supabase configuration', () => {
       }),
     ).toThrow(/Supabase environment variables are required/)
   })
+
+  it('reports malformed Supabase project URLs during deployment checks', () => {
+    expect(() =>
+      getSupabaseConfig({
+        VITE_SUPABASE_URL: 'not-a-url',
+        VITE_SUPABASE_ANON_KEY: 'public-anon-key',
+      }),
+    ).toThrow(/Supabase project URL must be a valid http or https URL/)
+  })
 })

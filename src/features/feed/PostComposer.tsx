@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { getSupabaseClient } from '../../lib/supabase'
 import { useAuth } from '../auth/use-auth'
 import { type CreatePostFormValues } from './post-schemas'
@@ -32,10 +32,10 @@ export function PostComposer({ onSuccess }: { onSuccess?: () => void }) {
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     setValue,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<CreatePostFormValues>({
     defaultValues: {
@@ -48,7 +48,7 @@ export function PostComposer({ onSuccess }: { onSuccess?: () => void }) {
     },
   })
 
-  const postType = watch('postType')
+  const postType = useWatch({ control, name: 'postType' })
 
   function addTag(tag: string) {
     const trimmed = tag.trim()

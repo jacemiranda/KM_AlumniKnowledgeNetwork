@@ -22,6 +22,15 @@ export function getSupabaseConfig(
     throw new Error('Supabase environment variables are required for OAuth sign-in.')
   }
 
+  try {
+    const parsedUrl = new URL(url)
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      throw new Error()
+    }
+  } catch {
+    throw new Error('Supabase project URL must be a valid http or https URL.')
+  }
+
   return { url, anonKey }
 }
 
