@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Feed States</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-[#0b1326] text-white antialiased">
+  <main class="mx-auto grid min-h-screen w-full max-w-5xl gap-6 px-4 py-10 md:grid-cols-3 md:px-6 lg:px-8">
+    <section class="rounded-[32px] border border-white/10 bg-[#131b2e]/60 p-6 shadow-[0_24px_48px_rgba(2,8,24,0.4)] backdrop-blur-2xl">
+      <div class="h-48 animate-pulse rounded-[28px] border border-white/10 bg-white/5 p-5">
+        <div class="h-4 w-24 rounded-full bg-white/10"></div>
+        <div class="mt-4 h-3 w-3/4 rounded-full bg-white/10"></div>
+        <div class="mt-3 h-3 w-5/6 rounded-full bg-white/10"></div>
+        <div class="mt-3 h-3 w-2/3 rounded-full bg-white/10"></div>
+      </div>
+      <p class="mt-4 text-sm text-slate-400">Loading</p>
+    </section>
+
+    <section class="rounded-[32px] border border-dashed border-emerald-300/25 bg-[#131b2e]/60 p-6 text-center shadow-[0_24px_48px_rgba(2,8,24,0.4)] backdrop-blur-2xl">
+      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-dashed border-emerald-300/25 bg-emerald-300/8">
+        <svg aria-hidden="true" class="h-12 w-12 text-emerald-300/55 drop-shadow-[0_0_18px_rgba(78,222,163,0.2)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m9-9H3" />
+          <circle cx="12" cy="12" r="8" />
+        </svg>
+      </div>
+      <h2 class="mt-4 text-lg font-extrabold text-white">No posts found</h2>
+      <p class="mt-2 text-sm text-slate-400">Try a different filter or be the first to share a useful insight.</p>
+    </section>
+
+    <section class="rounded-[32px] border border-[#ffb4ab]/30 bg-[#131b2e]/70 p-6 shadow-[0_0_0_1px_rgba(255,180,171,0.12),0_0_30px_rgba(255,180,171,0.08)] backdrop-blur-2xl">
+      <div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-[#ffb4ab] drop-shadow-[0_0_12px_rgba(255,180,171,0.45)]">
+        <svg aria-hidden="true" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86 2.82 17a2 2 0 0 0 1.72 3h15.92a2 2 0 0 0 1.72-3L14.71 3.86a2 2 0 0 0-3.42 0Z" />
+        </svg>
+      </div>
+      <h2 class="mt-4 text-lg font-extrabold text-white">Failed to load feed</h2>
+      <p class="mt-2 text-sm text-slate-400">Network request failed.</p>
+    </section>
+  </main>
+</body>
+</html>

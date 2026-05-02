@@ -1,65 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../auth/use-auth'
 import { useComments, useCreateComment, useDeleteComment } from './use-comments'
-import type { CommentWithAuthor } from './comment-service'
-
-function timeAgo(dateStr: string): string {
-  const now = Date.now()
-  const then = new Date(dateStr).getTime()
-  const diffMs = now - then
-  const minutes = Math.floor(diffMs / 60000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  return `${days}d ago`
-}
-
-function CommentItem({
-  comment,
-  currentUserId,
-  onDelete,
-}: {
-  comment: CommentWithAuthor
-  currentUserId: string | null
-  onDelete: (id: string) => void
-}) {
-  const author = comment.author
-  const isOwner = currentUserId === comment.author_id
-
-  return (
-    <div className="flex gap-3 rounded-2xl bg-ink-900/40 p-3">
-      {author?.profile_picture_url ? (
-        <img
-          src={author.profile_picture_url}
-          alt={author.name}
-          className="h-8 w-8 rounded-full object-cover"
-        />
-      ) : (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-300/20 text-xs font-bold text-emerald-200">
-          {author?.name?.charAt(0)?.toUpperCase() ?? '?'}
-        </div>
-      )}
-      <div className="flex-1">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-white">{author?.name ?? 'Unknown'}</span>
-          <span className="text-xs text-slate-500">{timeAgo(comment.created_at)}</span>
-        </div>
-        <p className="mt-1 text-sm text-slate-300">{comment.content}</p>
-        {isOwner && (
-          <button
-            type="button"
-            onClick={() => onDelete(comment.id)}
-            className="mt-1 text-xs text-red-400 transition hover:text-red-300"
-          >
-            Delete
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
+import { CommentThreadList, FeedSurface } from './feed-ui'
 
 export function CommentThread({ postId }: { postId: string }) {
   const { session } = useAuth()
@@ -82,58 +24,72 @@ export function CommentThread({ postId }: { postId: string }) {
   }
 
   return (
-    <div className="space-y-3">
-      <h3 className="text-sm font-extrabold uppercase tracking-[0.14em] text-white">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-sm font-extrabold uppercase tracking-[0.14em] text-white">
         Comments {comments ? `(${comments.length})` : ''}
-      </h3>
+        </h3>
+        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">
+          Threaded replies
+        </span>
+      </div>
 
       {/* Loading state */}
       {isLoading && (
-        <p className="text-sm text-slate-400">Loading comments...</p>
+        <FeedSurface className="p-4">
+          <p className="text-sm text-slate-400">Loading comments...</p>
+        </FeedSurface>
       )}
 
       {/* Error state */}
       {error && (
-        <p className="text-sm text-red-400">
-          {error instanceof Error ? error.message : 'Failed to load comments.'}
-        </p>
+        <FeedSurface className="border border-[#ffb4ab]/30 bg-[#131b2e]/70 p-4 shadow-[0_0_0_1px_rgba(255,180,171,0.12),0_0_30px_rgba(255,180,171,0.08)]">
+          <p className="text-sm text-red-300">
+            {error instanceof Error ? error.message : 'Failed to load comments.'}
+          </p>
+        </FeedSurface>
       )}
 
       {/* Empty state */}
       {!isLoading && !error && comments?.length === 0 && (
-        <p className="text-sm text-slate-500">No comments yet. Be the first to respond.</p>
+        <FeedSurface className="p-5">
+          <p className="text-sm text-slate-500">No comments yet. Be the first to respond.</p>
+        </FeedSurface>
+      )}
+
+      {/* Active comment composer */}
+      {session && (
+        <FeedSurface className="p-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <label className="block text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+              Add a reply
+            </label>
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Write a comment..."
+              className="min-h-[96px] w-full resize-none rounded-[24px] border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-300/30 focus:outline-none"
+              maxLength={2000}
+            />
+            <div className="flex items-center justify-end">
+              <button
+                type="submit"
+                disabled={!newComment.trim() || createComment.isPending}
+                className="rounded-full border border-[#ffb95f] border-t-[#ffb95f] bg-gradient-to-b from-emerald-300 via-emerald-500 to-emerald-950 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-emerald-50 transition hover:brightness-110 disabled:opacity-50"
+              >
+                {createComment.isPending ? 'Posting...' : 'Reply'}
+              </button>
+            </div>
+          </form>
+        </FeedSurface>
       )}
 
       {/* Comment list */}
-      {(comments ?? []).map((comment) => (
-        <CommentItem
-          key={comment.id}
-          comment={comment}
-          currentUserId={session?.user.id ?? null}
-          onDelete={handleDelete}
-        />
-      ))}
-
-      {/* New comment form */}
-      {session && (
-        <form onSubmit={handleSubmit} className="flex gap-2">
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Write a comment..."
-            className="flex-1 rounded-2xl border border-white/10 bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-emerald-300/30 focus:outline-none"
-            maxLength={2000}
-          />
-          <button
-            type="submit"
-            disabled={!newComment.trim() || createComment.isPending}
-            className="rounded-full border border-emerald-300/40 bg-emerald-300/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-emerald-100 transition hover:bg-emerald-300/25 disabled:opacity-50"
-          >
-            {createComment.isPending ? '...' : 'Reply'}
-          </button>
-        </form>
-      )}
+      <CommentThreadList
+        comments={comments ?? []}
+        currentUserId={session?.user.id ?? null}
+        onDelete={handleDelete}
+      />
 
       {createComment.error && (
         <p className="text-xs text-red-400">

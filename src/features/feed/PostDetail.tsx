@@ -4,6 +4,7 @@ import { CommentThread } from './CommentThread'
 import { useDeletePost, usePost } from './use-posts'
 import { useCastVote, useMyVote, useRemoveVote } from './use-votes'
 import type { VoteValue } from './vote-service'
+import { FeedSurface } from './feed-ui'
 
 function timeAgo(dateStr: string): string {
   const now = Date.now()
@@ -29,15 +30,15 @@ export function PostDetail() {
 
   if (isLoading) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-liquid backdrop-blur-2xl">
+      <FeedSurface className="p-8">
         <p className="text-sm text-slate-400">Loading post...</p>
-      </div>
+      </FeedSurface>
     )
   }
 
   if (error || !post) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-liquid backdrop-blur-2xl">
+      <FeedSurface className="p-8">
         <p className="text-sm text-red-400">
           {error instanceof Error ? error.message : 'Post not found.'}
         </p>
@@ -47,7 +48,7 @@ export function PostDetail() {
         >
           ← Back to feed
         </Link>
-      </div>
+      </FeedSurface>
     )
   }
 
@@ -83,7 +84,7 @@ export function PostDetail() {
       </Link>
 
       {/* Post card */}
-      <article className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-liquid backdrop-blur-2xl">
+      <article className="rounded-[32px] border border-white/10 bg-[#131b2e]/60 p-5 shadow-liquid backdrop-blur-2xl md:p-6">
         {/* Author */}
         <header className="mb-4 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -209,9 +210,9 @@ export function PostDetail() {
       </article>
 
       {/* Comments thread */}
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-liquid backdrop-blur-2xl">
+      <FeedSurface className="p-5 md:p-6">
         <CommentThread postId={post.id} />
-      </section>
+      </FeedSurface>
     </div>
   )
 }
