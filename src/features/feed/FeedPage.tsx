@@ -4,6 +4,7 @@ import type { PostFilters } from './post-service'
 import { FeedFilters } from './FeedFilters'
 import { PostCard } from './PostCard'
 import { PostComposer } from './PostComposer'
+import { FeedEmptyState, FeedErrorState, FeedLoadingState } from './feed-ui'
 import { usePosts } from './use-posts'
 
 export function FeedPage() {
@@ -42,29 +43,19 @@ export function FeedPage() {
         {/* Loading State */}
         {isLoading && (
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-40 animate-pulse rounded-3xl border border-white/10 bg-white/5 shadow-liquid backdrop-blur-2xl"
-              />
-            ))}
+            <FeedLoadingState />
+            <FeedLoadingState />
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="rounded-3xl border border-red-400/20 bg-red-400/5 p-6 text-sm text-red-300 shadow-liquid backdrop-blur-2xl">
-            {error instanceof Error ? error.message : 'Failed to load posts.'}
-          </div>
+          <FeedErrorState message={error instanceof Error ? error.message : 'Failed to load feed'} />
         )}
 
         {/* Empty State */}
         {!isLoading && !error && posts.length === 0 && (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-center shadow-liquid backdrop-blur-2xl">
-            <p className="text-sm text-slate-400">
-              No posts yet. Be the first to share a useful insight.
-            </p>
-          </div>
+          <FeedEmptyState />
         )}
 
         {/* Post List */}
