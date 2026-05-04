@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EraLink | Notifications</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          background: '#0b1326',
+          primary: '#4edea3',
+          secondary: '#ffb95f',
+        },
+        boxShadow: {
+          liquid: '0 20px 40px -18px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.02)'
+        }
+      }
+    }
+  }
+</script>
+</head>
+<body class="min-h-screen bg-background font-body text-white flex items-start justify-center pt-8">
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+  <div class="absolute -left-16 top-0 h-80 w-80 rounded-full bg-primary/10 blur-[120px]"></div>
+  <div class="absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-secondary/10 blur-[120px]"></div>
+</div>
+
+<!-- Notifications Modal -->
+<div class="w-full max-w-md rounded-[32px] border border-white/10 bg-[#131b2e]/60 shadow-liquid backdrop-blur-2xl overflow-hidden">
+  <!-- Header -->
+  <div class="border-b border-white/5 px-6 py-4 md:py-5">
+    <h2 class="text-xl font-black tracking-tight text-white">Notifications</h2>
+    <p class="mt-1 text-xs text-slate-500">You have 3 unread</p>
+  </div>
+
+  <!-- Notifications List -->
+  <div class="divide-y divide-white/5 max-h-[600px] overflow-y-auto">
+    <!-- Unread 1 - Bright Glass with Emerald Indicator -->
+    <div class="flex gap-4 border-l-2 border-primary bg-gradient-to-r from-primary/20 via-primary/5 to-transparent p-4 md:p-5 transition hover:from-primary/25 cursor-pointer">
+      <div class="relative mt-1 flex-shrink-0">
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400/40 to-primary/40 ring-2 ring-white/10 text-sm font-bold">⬆️</div>
+        <div class="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-primary ring-2 ring-[#131b2e]/80 animate-pulse"></div>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold text-white">Your answer received an upvote</p>
+        <p class="mt-1 text-xs text-slate-300">Sarah Jenkins found your answer helpful in "Career Transition Strategies"</p>
+        <p class="mt-2 text-xs text-primary font-medium">2 minutes ago</p>
+      </div>
+    </div>
+
+    <!-- Unread 2 - Bright Glass with Emerald Indicator -->
+    <div class="flex gap-4 border-l-2 border-primary bg-gradient-to-r from-primary/20 via-primary/5 to-transparent p-4 md:p-5 transition hover:from-primary/25 cursor-pointer">
+      <div class="relative mt-1 flex-shrink-0">
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400/40 to-primary/40 ring-2 ring-white/10 text-sm font-bold">💬</div>
+        <div class="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-primary ring-2 ring-[#131b2e]/80 animate-pulse"></div>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold text-white">Someone answered your question</p>
+        <p class="mt-1 text-xs text-slate-300">Marcus Kensington replied to your question about "Machine Learning Best Practices"</p>
+        <p class="mt-2 text-xs text-primary font-medium">15 minutes ago</p>
+      </div>
+    </div>
+
+    <!-- Unread 3 - Bright Glass with Emerald Indicator -->
+    <div class="flex gap-4 border-l-2 border-primary bg-gradient-to-r from-primary/20 via-primary/5 to-transparent p-4 md:p-5 transition hover:from-primary/25 cursor-pointer">
+      <div class="relative mt-1 flex-shrink-0">
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-secondary/40 to-yellow-500/40 ring-2 ring-white/10 text-sm font-bold">🏆</div>
+        <div class="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-primary ring-2 ring-[#131b2e]/80 animate-pulse"></div>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold text-white">You earned a badge</p>
+        <p class="mt-1 text-xs text-slate-300">Congratulations! You've unlocked the "Helpful Contributor" badge.</p>
+        <p class="mt-2 text-xs text-primary font-medium">1 hour ago</p>
+      </div>
+    </div>
+
+    <!-- Read 1 - Dimmer Glass, No Indicator -->
+    <div class="flex gap-4 border-l-2 border-transparent bg-white/[0.03] p-4 md:p-5 transition hover:bg-white/[0.06] cursor-pointer">
+      <div class="mt-1 flex-shrink-0">
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 ring-2 ring-white/5 text-sm font-bold text-slate-500">👤</div>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-medium text-slate-300">You have a new follower</p>
+        <p class="mt-1 text-xs text-slate-500">Leah Davis started following you</p>
+        <p class="mt-2 text-xs text-slate-600">3 hours ago</p>
+      </div>
+    </div>
+
+    <!-- Read 2 - Dimmer Glass, No Indicator -->
+    <div class="flex gap-4 border-l-2 border-transparent bg-white/[0.03] p-4 md:p-5 transition hover:bg-white/[0.06] cursor-pointer">
+      <div class="mt-1 flex-shrink-0">
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 ring-2 ring-white/5 text-sm font-bold text-slate-500">❤️</div>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-medium text-slate-300">Your post was liked</p>
+        <p class="mt-1 text-xs text-slate-500">James Liu liked your post "5 Tips for Career Growth"</p>
+        <p class="mt-2 text-xs text-slate-600">5 hours ago</p>
+      </div>
+    </div>
+
+    <!-- Read 3 - Dimmer Glass, No Indicator -->
+    <div class="flex gap-4 border-l-2 border-transparent bg-white/[0.03] p-4 md:p-5 transition hover:bg-white/[0.06] cursor-pointer">
+      <div class="mt-1 flex-shrink-0">
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 ring-2 ring-white/5 text-sm font-bold text-slate-500">🔔</div>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-medium text-slate-300">Weekly digest ready</p>
+        <p class="mt-1 text-xs text-slate-500">Your weekly activity digest is now available</p>
+        <p class="mt-2 text-xs text-slate-600">1 day ago</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="border-t border-white/5 px-6 py-3 bg-white/[0.02]">
+    <button class="text-sm font-semibold text-primary transition hover:text-primary/80">View all notifications →</button>
+  </div>
+</div>
+</body>
+</html>
