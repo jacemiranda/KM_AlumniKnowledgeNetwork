@@ -222,35 +222,16 @@ async function fetchBulkAuthorityScores(
   if (profileIds.length === 0) return scores
 
   const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('votes')
+    .select('target_id, value')
+    .in('target_id', profileIds)
 
-  // Sum votes from post_votes where the post's author is in profileIds
-  const { data: postVotes, error: postError } = await supabase
-    .from('post_votes')
-    .select('value, post:posts(author_id)')
-    .in('post.author_id', profileIds) as { data: Array<{ value: number; post: { author_id: string } | null }> | null; error: unknown }
+  if (error) return scores
 
-  if (!postError) {
-    for (const v of postVotes ?? []) {
-      if (v.post) {
-        const current = scores.get(v.post.author_id) ?? 0
-        scores.set(v.post.author_id, current + v.value)
-      }
-    }
-  }
-
-  // Sum votes from comment_votes where the comment's author is in profileIds
-  const { data: commentVotes, error: commentError } = await supabase
-    .from('comment_votes')
-    .select('value, comment:comments(author_id)')
-    .in('comment.author_id', profileIds) as { data: Array<{ value: number; comment: { author_id: string } | null }> | null; error: unknown }
-
-  if (!commentError) {
-    for (const v of commentVotes ?? []) {
-      if (v.comment) {
-        const current = scores.get(v.comment.author_id) ?? 0
-        scores.set(v.comment.author_id, current + v.value)
-      }
-    }
+  for (const row of data ?? []) {
+    const current = scores.get(row.target_id) ?? 0
+    scores.set(row.target_id, current + row.value)
   }
 
   return scores

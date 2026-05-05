@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
-import { NotificationsDropdown } from '../notifications/NotificationsDropdown'
 import { SearchBar } from '../search/SearchBar'
-import { Logo } from '../../components/Logo'
+
 const baseLinks = [
   { to: '/', label: 'Feed' },
   { to: '/search', label: 'Search' },
@@ -14,14 +12,8 @@ const baseLinks = [
 ]
 
 export function AppShell() {
-  const { session, profile, signOut } = useAuth()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const location = useLocation()
-
-  useEffect(() => {
-    setIsMobileMenuOpen(false)
-  }, [location.pathname])
-
+  const { session, signOut } = useAuth()
+  const navigate = useNavigate()
   const role = session?.user.role
   const shellLinks = role === 'admin' || role === 'moderator'
     ? [...baseLinks, { to: '/admin', label: 'Admin' }]
@@ -32,16 +24,20 @@ export function AppShell() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-clip bg-ink-950 px-4 pb-24 pt-6 text-slate-100 md:px-6 md:pb-8 lg:px-8">
+    <div className="relative min-h-screen overflow-hidden bg-ink-950 px-4 pb-24 pt-6 text-slate-100 md:px-6 md:pb-8 lg:px-8">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-20 -top-10 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl" />
         <div className="absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-cyan-300/10 blur-3xl" />
       </div>
 
       <div className="relative mx-auto grid w-full max-w-7xl gap-6 md:grid-cols-[240px_1fr] lg:grid-cols-[280px_1fr]">
-        <aside className="hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-liquid backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:border-emerald-300/40 hover:shadow-2xl hover:shadow-emerald-900/20 md:sticky md:top-6 md:block md:h-[calc(100vh-3rem)] overflow-y-auto overscroll-contain">
+        <aside className="hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-liquid backdrop-blur-2xl md:sticky md:top-6 md:block md:h-[calc(100vh-3rem)]">
           <div className="border-b border-white/10 pb-5">
-            <Logo className="h-10" />
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Alumni Knowledge Network</p>
+            <h1 className="mt-2 text-2xl font-black tracking-tight text-white">EraLink</h1>
+            <p className="mt-3 text-sm text-slate-300">
+              Knowledge sharing through feed, search, and alumni discovery.
+            </p>
           </div>
 
           {/* Sidebar Search */}
@@ -66,48 +62,34 @@ export function AppShell() {
             ))}
           </nav>
 
-          <div className="mt-8 border-t border-white/10 pt-4">
-            <button
-              className="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-left text-sm font-bold text-slate-300 transition hover:border-white/30 hover:bg-white/10 hover:text-white cursor-pointer"
-              onClick={signOut}
-              type="button"
-            >
-              Sign out
-            </button>
-          </div>
+          <button
+            onClick={() => navigate('/?compose=true')}
+            className="mt-6 w-full rounded-full border border-emerald-300/40 bg-emerald-300/15 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-100 cursor-pointer"
+          >
+            Create Post
+          </button>
         </aside>
 
-        <main className="flex flex-col gap-5">
-          {location.pathname === '/' && (
-            <header className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-liquid backdrop-blur-2xl sm:p-5">
+        <main className="grid gap-5">
+          <header className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-liquid backdrop-blur-2xl sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-4">
-                {profile?.profilePictureUrl ? (
-                  <img
-                    src={profile.profilePictureUrl}
-                    alt={session.user.name}
-                    className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10 transition hover:ring-emerald-300/50"
-                  />
-                ) : (
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 ring-2 ring-white/10 transition hover:ring-emerald-300/50">
-                    <span className="text-xl font-bold uppercase">{session.user.name.charAt(0)}</span>
-                  </div>
-                )}
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Authenticated</p>
-                  <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
-                  <p className="text-sm text-slate-300">
-                    {session.user.userType ?? 'profile pending'} - {session.user.email}
-                  </p>
-                </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Authenticated</p>
+                <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
+                <p className="text-sm text-slate-300">
+                  {session.user.userType ?? 'profile pending'} - {session.user.email}
+                </p>
               </div>
 
-              <div className="flex items-center gap-3">
-                <NotificationsDropdown />
-              </div>
+              <button
+                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-200 transition hover:border-white/30 hover:bg-white/10 cursor-pointer"
+                onClick={signOut}
+                type="button"
+              >
+                Sign out
+              </button>
             </div>
           </header>
-          )}
 
           <section>
             <Outlet />
@@ -115,73 +97,22 @@ export function AppShell() {
         </main>
       </div>
 
-      <nav className={`fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 gap-1 border-t border-white/10 bg-ink-950/95 p-2 backdrop-blur md:hidden`}>
-        {[{ to: '/', label: 'Feed' }, { to: '/search', label: 'Search' }, { to: '/notifications', label: 'Alerts' }].map((link) => (
+      <nav className={`fixed inset-x-0 bottom-0 z-20 grid gap-1 border-t border-white/10 bg-ink-950/95 p-2 backdrop-blur md:hidden`} style={{ gridTemplateColumns: `repeat(${shellLinks.length}, minmax(0, 1fr))` }}>
+        {shellLinks.map((link) => (
           <NavLink
             key={link.to}
             to={link.to}
             end={link.to === '/'}
             className={({ isActive }) =>
               isActive
-                ? 'rounded-xl bg-emerald-300/20 py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-100'
-                : 'rounded-xl py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 transition hover:text-slate-200'
+                ? 'rounded-xl bg-emerald-300/20 py-2 text-center text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-100'
+                : 'rounded-xl py-2 text-center text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400'
             }
           >
             {link.label}
           </NavLink>
         ))}
-        <button
-          type="button"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className={`rounded-xl py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.12em] transition cursor-pointer ${
-            isMobileMenuOpen ? 'bg-emerald-300/20 text-emerald-100' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Menu
-        </button>
       </nav>
-
-      {/* Mobile Menu Bottom Sheet */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-30 bg-ink-950/60 backdrop-blur-sm md:hidden" onClick={() => setIsMobileMenuOpen(false)}>
-          <div 
-            className="absolute bottom-16 left-0 right-0 rounded-t-3xl border-t border-white/10 bg-ink-950 p-6 shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-bold uppercase tracking-[0.12em] text-slate-300">Menu</h2>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="rounded-full bg-white/5 p-2 text-slate-400 hover:text-white cursor-pointer transition">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <nav className="grid gap-2">
-              {shellLinks.filter(l => !['/', '/search', '/notifications'].includes(l.to)).map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  className={({ isActive }) =>
-                    isActive
-                      ? 'rounded-2xl border border-emerald-300/40 bg-emerald-300/15 px-4 py-3 text-sm font-bold text-emerald-100'
-                      : 'rounded-2xl border border-transparent bg-white/5 px-4 py-3 text-sm text-slate-300 transition hover:border-white/10 hover:text-slate-100 cursor-pointer'
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              ))}
-              <div className="my-2 border-t border-white/10" />
-              <button
-                className="w-full rounded-2xl border border-red-400/20 bg-red-400/5 px-4 py-3 text-left text-sm font-bold text-red-300 transition hover:bg-red-400/10 cursor-pointer"
-                onClick={signOut}
-                type="button"
-              >
-                Sign out
-              </button>
-            </nav>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

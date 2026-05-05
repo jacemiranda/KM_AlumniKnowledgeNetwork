@@ -15,8 +15,6 @@ import {
   restorePost,
   revokeBadge,
   toggleField,
-  createField,
-  createTag,
   unblockUser,
   updateUserRole,
   type ContentFilters,
@@ -201,32 +199,6 @@ export function useToggleField() {
       toggleField(session!.user.id, fieldId, isActive),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: MODERATION_KEYS.all })
-    },
-  })
-}
-
-export function useCreateField() {
-  const queryClient = useQueryClient()
-  const { session } = useAuth()
-
-  return useMutation({
-    mutationFn: ({ name }: { name: string }) => createField(session!.user.id, name),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: MODERATION_KEYS.fields })
-      void queryClient.invalidateQueries({ queryKey: MODERATION_KEYS.log(1) })
-    },
-  })
-}
-
-export function useCreateTag() {
-  const queryClient = useQueryClient()
-  const { session } = useAuth()
-
-  return useMutation({
-    mutationFn: ({ name }: { name: string }) => createTag(session!.user.id, name),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['tags'] })
-      void queryClient.invalidateQueries({ queryKey: MODERATION_KEYS.log(1) })
     },
   })
 }

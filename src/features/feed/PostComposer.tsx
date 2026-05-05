@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useCallback, useEffect, useState } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { getSupabaseClient } from '../../lib/supabase'
 import { useAuth } from '../auth/use-auth'
@@ -8,54 +8,11 @@ import { findOrCreateTags } from './tag-service'
 import { useCreatePost } from './use-posts'
 import { useTags } from './use-tags'
 
-type PostComposerProps = {
-  onSuccess?: () => void
-  initialTaggedAlumni?: { id: string; name: string } | null
-  initialPostType?: 'information' | 'question'
-}
-
-export function PostComposer({
-  onSuccess,
-  initialTaggedAlumni = null,
-  initialPostType = 'information',
-}: PostComposerProps) {
+export function PostComposer({ onSuccess }: { onSuccess?: () => void }) {
   const { session } = useAuth()
   const createPost = useCreatePost()
   const [tagInput, setTagInput] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
-
-  // Alumni tagging state
-  const [alumniSearch, setAlumniSearch] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [selectedAlumni, setSelectedAlumni] = useState<{ id: string; name: string } | null>(
-    initialTaggedAlumni,
-  )
-  const [showAlumniDropdown, setShowAlumniDropdown] = useState(false)
-
-  // Debounce alumni search
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(alumniSearch), 300)
-    return () => clearTimeout(timer)
-  }, [alumniSearch])
-
-  // Search alumni profiles
-  const { data: alumniResults } = useQuery({
-    queryKey: ['alumni-search', debouncedSearch],
-    queryFn: async () => {
-      if (!debouncedSearch || debouncedSearch.length < 2) return []
-      const supabase = getSupabaseClient()
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, name, profile_picture_url')
-        .eq('user_type', 'alumni')
-        .eq('status', 'active')
-        .ilike('name', `%${debouncedSearch}%`)
-        .limit(6)
-      if (error) return []
-      return data as Array<{ id: string; name: string; profile_picture_url: string | null }>
-    },
-    enabled: debouncedSearch.length >= 2,
-  })
 
   const { data: fieldOptions } = useQuery({
     queryKey: ['fields-list'],
@@ -85,31 +42,13 @@ export function PostComposer({
       title: '',
       content: '',
       fieldId: '',
-      postType: initialPostType,
+      postType: 'information',
       tagNames: [],
-      taggedAlumniId: initialTaggedAlumni?.id ?? null,
+      taggedAlumniId: null,
     },
   })
 
   const postType = useWatch({ control, name: 'postType' })
-
-  // Close dropdown on outside click
-  const handleDropdownBlur = useCallback(() => {
-    // Delay so click events on dropdown items fire first
-    setTimeout(() => setShowAlumniDropdown(false), 200)
-  }, [])
-
-  function selectAlumni(alumni: { id: string; name: string }) {
-    setSelectedAlumni(alumni)
-    setValue('taggedAlumniId', alumni.id)
-    setAlumniSearch('')
-    setShowAlumniDropdown(false)
-  }
-
-  function clearAlumni() {
-    setSelectedAlumni(null)
-    setValue('taggedAlumniId', null)
-  }
 
   function addTag(tag: string) {
     const trimmed = tag.trim()
@@ -151,7 +90,6 @@ export function PostComposer({
       reset()
       setSelectedTags([])
       setTagInput('')
-      setSelectedAlumni(null)
       onSuccess?.()
     } catch {
       // Error is handled by mutation state
@@ -215,95 +153,26 @@ export function PostComposer({
           )}
         </div>
 
-        {/* Field & Alumni row */}
-        <div className="mb-3 grid gap-3 sm:grid-cols-2">
-          {/* Field Selector — single controlled select, no conflicting defaultValue */}
+        <div>
           <select
             {...register('fieldId')}
-            className="custom-select w-full rounded-2xl border border-white/10 bg-ink-900/60 px-4 py-3 text-sm text-white focus:border-emerald-300/30 focus:outline-none"
+            className="w-full rounded-[22px] border border-white/10 bg-black/20 px-4 py-3 text-sm text-white focus:border-emerald-300/30 focus:outline-none"
+            defaultValue=""
           >
-            <option value="">Select a field...</option>
+            <option value="" disabled>
+              Select a field...
+            </option>
             {(fieldOptions ?? []).map((field) => (
               <option key={field.id} value={field.id}>
                 {field.name}
               </option>
             ))}
           </select>
-
-          {/* Tag Alumni Selector */}
-          <div className="relative">
-            {selectedAlumni ? (
-              <div className="flex items-center gap-2 rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-3">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 text-cyan-300">
-                  <path d="M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z" />
-                </svg>
-                <span className="flex-1 truncate text-sm font-semibold text-cyan-100">
-                  {selectedAlumni.name}
-                </span>
-                <button
-                  type="button"
-                  onClick={clearAlumni}
-                  className="text-cyan-300/60 transition hover:text-white"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                    <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-                  </svg>
-                </button>
-              </div>
-            ) : (
-              <div className="relative">
-                <input
-                  type="text"
-                  value={alumniSearch}
-                  onChange={(e) => {
-                    setAlumniSearch(e.target.value)
-                    setShowAlumniDropdown(true)
-                  }}
-                  onFocus={() => alumniSearch.length >= 2 && setShowAlumniDropdown(true)}
-                  onBlur={handleDropdownBlur}
-                  placeholder="Tag an alumni expert..."
-                  className="w-full rounded-2xl border border-white/10 bg-ink-900/60 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-300/30 focus:outline-none"
-                />
-
-                {/* Dropdown results */}
-                {showAlumniDropdown && (alumniResults ?? []).length > 0 && (
-                  <div className="absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-2xl border border-white/10 bg-ink-900/95 shadow-xl backdrop-blur-2xl">
-                    {(alumniResults ?? []).map((alumni) => (
-                      <button
-                        key={alumni.id}
-                        type="button"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => selectAlumni(alumni)}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/5 cursor-pointer"
-                      >
-                        {alumni.profile_picture_url ? (
-                          <img
-                            src={alumni.profile_picture_url}
-                            alt={alumni.name}
-                            className="h-7 w-7 rounded-full object-cover ring-1 ring-white/10"
-                          />
-                        ) : (
-                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-400/20 text-[10px] font-bold text-cyan-200 ring-1 ring-white/10">
-                            {alumni.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)}
-                          </div>
-                        )}
-                        <span className="truncate text-sm text-slate-200">{alumni.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          {errors.fieldId && <p className="mt-1 text-xs text-red-400">{errors.fieldId.message}</p>}
         </div>
 
-        {errors.fieldId && (
-          <p className="-mt-2 mb-3 text-xs text-red-400">{errors.fieldId.message}</p>
-        )}
-
-        {/* Tag Input */}
-        <div className="mb-3">
-          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-ink-900/60 px-4 py-2">
+        <div>
+          <div className="flex flex-wrap items-center gap-2 rounded-[24px] border border-white/10 bg-black/20 px-4 py-3">
             {selectedTags.map((tag) => (
               <span
                 key={tag}
@@ -336,34 +205,7 @@ export function PostComposer({
                 ))}
             </datalist>
           </div>
-          
-          {/* Tag Suggestions List */}
-          {(existingTags ?? []).filter((t) => !selectedTags.includes(t.name)).length > 0 && (
-            <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Suggested:
-              </span>
-              {(existingTags ?? [])
-                .filter((t) => !selectedTags.includes(t.name))
-                // Optionally filter by tagInput if you want dynamic suggestions, but static is fine for discoverability
-                .filter((t) => !tagInput || t.name.toLowerCase().includes(tagInput.toLowerCase()))
-                .slice(0, 15)
-                .map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => addTag(t.name)}
-                    className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] text-slate-300 transition hover:border-emerald-300/30 hover:bg-emerald-300/10 hover:text-emerald-200 cursor-pointer"
-                  >
-                    + {t.name}
-                  </button>
-                ))}
-            </div>
-          )}
-
-          {errors.tagNames && (
-            <p className="mt-1 text-xs text-red-400">{errors.tagNames.message}</p>
-          )}
+          {errors.tagNames && <p className="mt-1 text-xs text-red-400">{errors.tagNames.message}</p>}
         </div>
 
         {/* Actions */}

@@ -3,10 +3,24 @@ import { FeedPage as FeedFeaturePage } from '../features/feed/FeedPage'
 import { PostDetail } from '../features/feed/PostDetail'
 import { LeaderboardPage as LeaderboardFeaturePage } from '../features/leaderboard/LeaderboardPage'
 import { UserManagementPage as UserManagementFeaturePage } from '../features/moderation/UserManagementPage'
-import { NotificationsPage as NotificationsFeaturePage } from '../features/notifications/NotificationsPage'
 import { ProfilePage as ProfileFeaturePage } from '../features/profile/ProfilePage'
 import { SearchPage as SearchFeaturePage } from '../features/search/SearchPage'
 import { SetupPage as SetupFeaturePage } from '../features/setup/SetupPage'
+
+type PlaceholderPageProps = {
+  title: string
+  description: string
+}
+
+function PlaceholderPage({ title, description }: PlaceholderPageProps) {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-slate-100 shadow-liquid backdrop-blur-2xl">
+      <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Shell placeholder</p>
+      <h2 className="mt-3 text-3xl font-black tracking-tight text-white">{title}</h2>
+      <p className="mt-3 text-base text-slate-300">{description}</p>
+    </div>
+  )
+}
 
 export function FeedPage() {
   return <FeedFeaturePage />
@@ -37,7 +51,12 @@ export function LeaderboardPage() {
 }
 
 export function NotificationsPage() {
-  return <NotificationsFeaturePage />
+  return (
+    <PlaceholderPage
+      title="Notifications"
+      description="The notifications modal and live activity are not part of this scaffold. This placeholder keeps the shell navigation coherent."
+    />
+  )
 }
 
 export function UserManagementPage() {
