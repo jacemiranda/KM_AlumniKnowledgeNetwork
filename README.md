@@ -207,6 +207,8 @@ Vercel is the MVP deployment target.
 | `docs/project/ACCEPTANCE_CRITERIA.md` | Final quality and runnable-app checks |
 | `CONTRIBUTING.md` | Branch, PR, commit, and review workflow |
 | `docs/decision-log.md` | Key project decisions |
+| `docs/wiki/user-guide.md` | Platform user guide for all roles |
+| `docs/wiki/structure.md` | GitHub Wiki structure overview |
 
 ## Team AI Setup (StitchMCP)
 
