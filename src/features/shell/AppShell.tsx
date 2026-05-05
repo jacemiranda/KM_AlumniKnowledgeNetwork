@@ -93,10 +93,10 @@ export function AppShell() {
             </div>
           )}
           <div className="text-left">
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Authenticated</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{session.user.userType ?? 'pending'}</p>
             <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
             <p className="text-sm text-slate-300">
-              {session.user.userType ?? 'profile pending'} - {session.user.email}
+              {session.user.email}
             </p>
           </div>
         </button>
@@ -128,10 +128,10 @@ export function AppShell() {
             </div>
           )}
           <div className="text-left">
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Authenticated</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{session.user.userType ?? 'pending'}</p>
             <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
             <p className="text-sm text-slate-300">
-              {session.user.userType ?? 'profile pending'} - {session.user.email}
+              {session.user.email}
             </p>
           </div>
         </button>

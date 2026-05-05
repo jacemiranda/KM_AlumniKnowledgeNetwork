@@ -51,8 +51,8 @@ export function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ink-950 via-ink-900 to-ink-950 p-6">
-      <div className="max-w-3xl mx-auto">
+    <div className="space-y-6">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-liquid backdrop-blur-2xl">
         {/* Header */}
         <div className="mb-8">
           <Link to="/" className="text-emerald-200 hover:text-emerald-100 text-sm font-semibold mb-4 inline-flex items-center gap-1">

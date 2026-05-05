@@ -46,7 +46,7 @@ export function SearchBar({
     (e: React.FormEvent) => {
       e.preventDefault()
       const trimmed = value.trim()
-      if (!trimmed) return
+      if (trimmed.length < 1) return
 
       if (navigateOnSubmit) {
         navigate(`/search?q=${encodeURIComponent(trimmed)}`)
