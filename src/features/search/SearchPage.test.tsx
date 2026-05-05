@@ -62,13 +62,13 @@ describe('SearchPage', () => {
     renderSearchPage()
 
     expect(screen.getByRole('heading', { name: /^search$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Posts' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'People' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^all/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^posts/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^people/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /avery alumni/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /react study group/i })).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Posts' }))
+    fireEvent.click(screen.getByRole('button', { name: /^posts/i }))
 
     expect(screen.queryByRole('heading', { name: /avery alumni/i })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /react study group/i })).toBeInTheDocument()
