@@ -64,6 +64,10 @@ All notable project changes should be recorded here.
 
 ## Sprint 1 - Foundation
 
+- Added M1 PR-02: Decision Log and Standups Revised.
+  - Completed `docs/decision-log.md` with five approved decisions: SECI retention, comments-based interaction, OAuth-only auth, feed-first UX, and simplified MVP scope.
+  - Created `docs/standups/week-01-standup.md` with Week 1 member updates, decisions confirmed, risks, and next actions.
+
 - OAuth authentication, first-time profile setup, field and skill taxonomy, feed foundation, and SECI setup.
 
 ## Sprint 2 - Core Interaction
