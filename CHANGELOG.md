@@ -68,6 +68,10 @@ All notable project changes should be recorded here.
 
 ## Sprint 2 - Core Interaction
 
+- Added M1 PR-01: Standups Sprint 2 Revised.
+  - Created `docs/standups/week-03-standup.md` with Sprint 2 Week 1 member updates, blocker tracking, decisions, and next actions.
+  - Created `docs/standups/week-04-standup.md` with Sprint 2 Week 2 integration checkpoint, gate confirmation, and close-out coordination.
+
 - Posts, comments, search, alumni discovery, voting, authority score, and notifications modal.
 
 ## Sprint 3 - Final Release
