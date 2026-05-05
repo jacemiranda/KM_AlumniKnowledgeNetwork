@@ -20,6 +20,8 @@ export function AppShell() {
   const headerRef = useRef<HTMLElement | null>(null)
   const [isScrolledPast, setIsScrolledPast] = useState(false)
   const [isFloatingVisible, setIsFloatingVisible] = useState(false)
+  const [floatingStyle, setFloatingStyle] = useState<{ left: number; width: number } | null>(null)
+  const [showEdgeBlur, setShowEdgeBlur] = useState(false)
 
   useEffect(() => {
     setIsMobileMenuOpen(false)
@@ -37,10 +39,27 @@ export function AppShell() {
   useEffect(() => {
     function updateScrollState() {
       const el = headerRef.current
-      if (!el) return setIsScrolledPast(false)
+      if (!el) {
+        setIsScrolledPast(false)
+        setFloatingStyle(null)
+        setShowEdgeBlur(false)
+        return
+      }
+
       const rect = el.getBoundingClientRect()
-      const threshold = rect.bottom + window.scrollY
-      setIsScrolledPast(window.scrollY > threshold)
+      const pageYOffset = window.scrollY || window.pageYOffset
+      const threshold = rect.bottom + pageYOffset
+      const scrolledPastNow = pageYOffset > threshold
+      setIsScrolledPast(scrolledPastNow)
+
+      // Calculate floating left and width to match inline header
+      const left = rect.left
+      const width = rect.width
+      setFloatingStyle({ left: Math.max(0, left), width: Math.max(0, width) })
+
+      // Show subtle blur overlays when the page is scrolled (and not at bottom)
+      const atBottom = Math.abs((window.innerHeight + pageYOffset) - document.body.scrollHeight) < 2
+      setShowEdgeBlur(pageYOffset > 0 && !atBottom)
     }
 
     updateScrollState()
@@ -148,18 +167,27 @@ export function AppShell() {
               )}
 
               {/* Floating header revealed on hover of trigger zone */}
-              {isScrolledPast && (
+              {isScrolledPast && floatingStyle && (
                 <div
                   onMouseEnter={() => setIsFloatingVisible(true)}
                   onMouseLeave={() => setIsFloatingVisible(false)}
-                  className={`pointer-events-auto fixed top-4 left-0 right-0 z-50 mx-auto max-w-4xl transform transition-transform duration-300 ease-out ${
+                  className={`pointer-events-auto fixed top-4 z-50 transform transition-transform duration-300 ease-out ${
                     isFloatingVisible ? 'translate-y-0' : '-translate-y-[150%]'
                   }`}
+                  style={{ left: `${floatingStyle.left}px`, width: `${floatingStyle.width}px` }}
                 >
                   <div className="rounded-3xl border border-white/10 bg-[#131b2e]/80 backdrop-blur-2xl shadow-lg p-4 sm:p-5">
                     {renderTopBarContent()}
                   </div>
                 </div>
+              )}
+
+              {/* Edge blur overlays to focus center posts while scrolling */}
+              {showEdgeBlur && (
+                <>
+                  <div className="fixed top-0 left-0 right-0 h-12 pointer-events-none z-40 backdrop-blur-sm bg-gradient-to-b from-[#131b2e]/30 to-transparent" />
+                  <div className="fixed bottom-0 left-0 right-0 h-12 pointer-events-none z-40 backdrop-blur-sm bg-gradient-to-t from-[#131b2e]/30 to-transparent" />
+                </>
               )}
             </>
           )}
