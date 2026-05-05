@@ -4,6 +4,11 @@ All notable project changes should be recorded here.
 
 ## Unreleased
 
+- Added M5 Sprint 1 PR-01: Sprint 1 OAuth Profile Feed Checklist.
+  - Created 20 acceptance test cases (TC-001 through TC-020) covering OAuth login, route protection, first-time profile setup, feed shell, and cross-cutting checks.
+  - Test cases follow the format from `docs/test-cases/README.md` with feature, role, sprint, priority, preconditions, steps, and expected result.
+  - Created M5 QA prompt log with the first entry documenting AI-assisted test case generation.
+
 - Added Sprint 3 PR-03: Deploy and Hardening Revised.
   - Added Vercel deployment config with Vite build settings and SPA route rewrites.
   - Added `npm run verify:deploy` for lint, tests, and production build verification.
