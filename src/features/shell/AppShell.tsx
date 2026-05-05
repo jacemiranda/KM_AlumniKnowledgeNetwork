@@ -18,9 +18,11 @@ export function AppShell() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const location = useLocation()
   const headerRef = useRef<HTMLElement | null>(null)
+  const mainRef = useRef<HTMLElement | null>(null)
   const [isScrolledPast, setIsScrolledPast] = useState(false)
   const [isFloatingVisible, setIsFloatingVisible] = useState(false)
   const [floatingStyle, setFloatingStyle] = useState<{ left: number; width: number } | null>(null)
+  const [mainStyle, setMainStyle] = useState<{ left: number; width: number } | null>(null)
   const [showEdgeBlur, setShowEdgeBlur] = useState(false)
 
   useEffect(() => {
@@ -43,6 +45,7 @@ export function AppShell() {
         setIsScrolledPast(false)
         setFloatingStyle(null)
         setShowEdgeBlur(false)
+        setMainStyle(null)
         return
       }
 
@@ -56,6 +59,13 @@ export function AppShell() {
       const left = rect.left
       const width = rect.width
       setFloatingStyle({ left: Math.max(0, left), width: Math.max(0, width) })
+
+      // Measure main feed column to constrain overlays and trigger zone
+      const mainEl = mainRef.current
+      if (mainEl) {
+        const mainRect = mainEl.getBoundingClientRect()
+        setMainStyle({ left: Math.max(0, mainRect.left), width: Math.max(0, mainRect.width) })
+      }
 
       // Show subtle blur overlays when the page is scrolled (and not at bottom)
       const atBottom = Math.abs((window.innerHeight + pageYOffset) - document.body.scrollHeight) < 2
@@ -148,7 +158,7 @@ export function AppShell() {
           </div>
         </aside>
 
-        <main className="flex flex-col gap-5">
+        <main ref={mainRef} className="flex flex-col gap-5">
           {location.pathname === '/' && (
             <>
               {/* Inline header (original document flow) */}
@@ -157,11 +167,12 @@ export function AppShell() {
               </header>
 
               {/* Trigger zone (appears only after header scrolls past) */}
-              {isScrolledPast && (
+              {isScrolledPast && mainStyle && (
                 <div
                   onMouseEnter={() => setIsFloatingVisible(true)}
                   onMouseLeave={() => setIsFloatingVisible(false)}
-                  className="fixed top-0 left-0 w-full h-12 z-40"
+                  className="fixed top-0 h-12 z-40"
+                  style={{ left: `${mainStyle.left}px`, width: `${mainStyle.width}px` }}
                   aria-hidden
                 />
               )}
@@ -183,10 +194,16 @@ export function AppShell() {
               )}
 
               {/* Edge blur overlays to focus center posts while scrolling */}
-              {showEdgeBlur && (
+              {showEdgeBlur && mainStyle && (
                 <>
-                  <div className="fixed top-0 left-0 right-0 h-12 pointer-events-none z-40 backdrop-blur-sm bg-gradient-to-b from-[#131b2e]/30 to-transparent" />
-                  <div className="fixed bottom-0 left-0 right-0 h-12 pointer-events-none z-40 backdrop-blur-sm bg-gradient-to-t from-[#131b2e]/30 to-transparent" />
+                  <div
+                    className="fixed top-0 h-12 pointer-events-none z-40 backdrop-blur-sm bg-gradient-to-b from-[#131b2e]/30 to-transparent"
+                    style={{ left: `${mainStyle.left}px`, width: `${mainStyle.width}px` }}
+                  />
+                  <div
+                    className="fixed bottom-0 h-12 pointer-events-none z-40 backdrop-blur-sm bg-gradient-to-t from-[#131b2e]/30 to-transparent"
+                    style={{ left: `${mainStyle.left}px`, width: `${mainStyle.width}px` }}
+                  />
                 </>
               )}
             </>
