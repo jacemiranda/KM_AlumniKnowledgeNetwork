@@ -72,4 +72,10 @@ All notable project changes should be recorded here.
 
 ## Sprint 3 - Final Release
 
+- Added M1 PR-02: Final Decision Log and Board Revised.
+  - Added four Sprint 3 decisions to `docs/decision-log.md`: 16 Tier 1 badge scope, Vercel as deployment platform, MVP scope freeze at Week 5, and analytics restricted to platform-wide counts.
+  - Created `docs/standups/week-05-standup.md` with Sprint 3 Week 1 member updates, scope freeze decision, and M5 QA blocker tracking.
+  - Created `docs/standups/week-06-standup.md` with Sprint 3 Week 2 final gate status, remaining blockers, and sign-off coordination notes.
+  - Created `docs/sprint-tracking/sprint3-board.md` with Sprint 3 PR status table, gate criteria, board column mapping, and milestone closure blockers.
+
 - Leaderboard, badges, moderation, user management, analytics, deployment, QA, and final documentation.
