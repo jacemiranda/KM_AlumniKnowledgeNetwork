@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
+import { NotificationsDropdown } from '../notifications/NotificationsDropdown'
 import { SearchBar } from '../search/SearchBar'
 import { Logo } from '../../components/Logo'
 const baseLinks = [
@@ -9,7 +10,6 @@ const baseLinks = [
   { to: '/alumni', label: 'Alumni' },
   { to: '/profile', label: 'Profile' },
   { to: '/leaderboard', label: 'Leaderboard' },
-  { to: '/notifications', label: 'Notifications' },
 ]
 
 export function AppShell() {
@@ -101,6 +101,37 @@ export function AppShell() {
     )
   }
 
+  function renderFloatingHeaderContent() {
+    return (
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-4">
+          {profile?.profilePictureUrl ? (
+            <img
+              src={profile.profilePictureUrl}
+              alt={session.user.name}
+              className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10 transition hover:ring-emerald-300/50"
+            />
+          ) : (
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 ring-2 ring-white/10 transition hover:ring-emerald-300/50">
+              <span className="text-xl font-bold uppercase">{session.user.name.charAt(0)}</span>
+            </div>
+          )}
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Authenticated</p>
+            <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
+            <p className="text-sm text-slate-300">
+              {session.user.userType ?? 'profile pending'} - {session.user.email}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <NotificationsDropdown />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="relative min-h-screen overflow-clip bg-ink-950 px-4 pb-24 pt-6 text-slate-100 md:px-6 md:pb-8 lg:px-8">
       <div className="pointer-events-none absolute inset-0">
@@ -177,7 +208,7 @@ export function AppShell() {
                   style={{ left: `${floatingStyle.left}px`, width: `${floatingStyle.width}px` }}
                 >
                   <div className="rounded-3xl border border-white/10 bg-[#131b2e]/80 backdrop-blur-2xl p-4 sm:p-5" style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3)' }}>
-                    {renderTopBarContent()}
+                    {renderFloatingHeaderContent()}
                   </div>
                 </div>
               )}
