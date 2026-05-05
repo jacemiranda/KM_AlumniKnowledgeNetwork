@@ -68,11 +68,9 @@ All notable project changes should be recorded here.
 
 ## Sprint 1 - Foundation
 
-- Added M1 PR-01: Repo Governance Revised.
-  - Revised `.github/pull_request_template.md` with a PR checklist aligned to the revised MVP workflow.
-  - Added `docs/github-setup/labels.md` with label definitions for type, sprint, member, status, and priority tracking.
-  - Added `docs/github-setup/board-setup.md` with board column structure, milestone definitions, issue linking convention, and Definition of Done.
-  - Updated `docs/PR-TEMPLATE.md` to reference `.github/pull_request_template.md` as the canonical template.
+- Added M1 PR-02: Decision Log and Standups Revised.
+  - Completed `docs/decision-log.md` with five approved decisions: SECI retention, comments-based interaction, OAuth-only auth, feed-first UX, and simplified MVP scope.
+  - Created `docs/standups/week-01-standup.md` with Week 1 member updates, decisions confirmed, risks, and next actions.
 
 - OAuth authentication, first-time profile setup, field and skill taxonomy, feed foundation, and SECI setup.
 
