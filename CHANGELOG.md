@@ -72,6 +72,13 @@ All notable project changes should be recorded here.
 - Added M5 Sprint 2 PR-01: Sprint 2 Feed Search Voting Cases.
   - Created 10 QA test cases in `docs/test-cases/sprint2-feed-search-voting-cases.md` covering feed posting, comments, search filters, voting, and profile metrics.
   - Updated M5 QA prompt log with Sprint 2 test case generation prompt.
+- Added M5 Sprint 2 PR-02: GitHub Issues QA Log Revised.
+  - Created `docs/test-cases/sprint2-github-issues-qa-log.md` with simulated bug reports, reproduction notes, and retest comments for Sprint 2.
+  - Updated M5 QA prompt log with Sprint 2 QA issue log generation prompt.
+- Added M5 Sprint 2 PR-03: Wiki and QA Update Sprint 2.
+  - Created `docs/wiki/structure.md` outlining the proposed GitHub Wiki structure.
+  - Created `docs/test-cases/sprint2-qa-report.md` summarizing the Sprint 2 test execution and sign-off.
+  - Updated M5 QA prompt log with Sprint 2 wiki and QA report generation.
 
 ## Sprint 1 - Foundation
 

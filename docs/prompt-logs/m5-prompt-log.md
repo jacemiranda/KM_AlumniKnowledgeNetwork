@@ -149,3 +149,53 @@ Reflection:
 - What helped? The AI strictly followed the template defined in Sprint 1.
 - What did you verify? Ensured that both post-level voting and profile-level voting were represented in the test cases.
 - What did you change manually? Grouped the test cases logically by feature (Feed, Comments, Search, Alumni Discovery, Voting).
+
+## Entry 7
+
+Date: 2026-05-05
+Sprint: 2
+PR: PR-02
+Tool / AI Used: AI Assistant
+
+Prompt:
+
+```text
+Draft a GitHub Issues QA Log for Sprint 2 based on the TC-001 to TC-010 test cases. Include simulated bug reports, reproduction steps, expected behavior, and retest comments. Save it to docs/test-cases/sprint2-github-issues-qa-log.md.
+```
+
+Output Used:
+- 5 simulated GitHub issues covering post composer state, empty search, alumni sorting, comment counts, and upvoting duplicates.
+
+Changes Made After Review:
+- Ensured the issues mapped realistically to the expected behavior defined in the test cases.
+
+Reflection:
+- What helped? The AI effectively synthesized realistic integration issues that typically occur during these types of feature connections.
+- What did you verify? Verified that each issue referenced a valid test case ID.
+- What did you change manually? Formatted the output to clearly highlight the Retest Status.
+
+## Entry 8
+
+Date: 2026-05-05
+Sprint: 2
+PR: PR-03
+Tool / AI Used: AI Assistant
+
+Prompt:
+
+```text
+Draft the wiki structure outlining the user guides, technical documentation, and QA sections. Also, create the Sprint 2 QA report summarizing the successful execution of the 10 test cases and the resolution of the issues logged in the previous step. Finally, update my prompt log.
+```
+
+Output Used:
+- `docs/wiki/structure.md` file detailing the wiki pages.
+- `docs/test-cases/sprint2-qa-report.md` with the execution summary and sign-off.
+
+Changes Made After Review:
+- Verified that the wiki structure matches the revised MVP scope (e.g., removed direct messaging sections).
+
+Reflection:
+- What helped? The AI structured the QA report professionally and correctly referenced the issues log.
+- What did you verify? Ensured the QA report covered all the feature areas defined in Sprint 2.
+- What did you change manually? Formatted the output to align with the repository standards.
+
