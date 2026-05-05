@@ -67,8 +67,6 @@ function getAuthErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : 'Authentication failed.'
 }
 
-const IDLE_TIMEOUT_MS = 15 * 60 * 1000 // 15 minutes
-
 export function AuthProvider({ children, client }: AuthProviderProps) {
   const [supabaseClient] = useState<AuthSupabaseClient>(() =>
     client ?? (getSupabaseClient() as unknown as AuthSupabaseClient),
@@ -180,37 +178,6 @@ export function AuthProvider({ children, client }: AuthProviderProps) {
     setProfile(null)
     setStatus('unauthenticated')
   }, [supabaseClient])
-
-  // Inactivity timeout
-  useEffect(() => {
-    if (status !== 'authenticated') return
-
-    let timeoutId: number
-
-    function resetTimer() {
-      window.clearTimeout(timeoutId)
-      timeoutId = window.setTimeout(() => {
-        // eslint-disable-next-line no-console
-        console.log('User signed out due to inactivity')
-        void signOut()
-      }, IDLE_TIMEOUT_MS)
-    }
-
-    const events = ['mousemove', 'keydown', 'wheel', 'click', 'touchstart']
-    
-    for (const event of events) {
-      window.addEventListener(event, resetTimer, { passive: true })
-    }
-
-    resetTimer()
-
-    return () => {
-      window.clearTimeout(timeoutId)
-      for (const event of events) {
-        window.removeEventListener(event, resetTimer)
-      }
-    }
-  }, [status, signOut])
 
   const value = useMemo<AuthContextValue>(
     () => ({

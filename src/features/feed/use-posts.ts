@@ -7,8 +7,6 @@ import {
   fetchPosts,
   type CreatePostInput,
   type PostFilters,
-  type UpdatePostInput,
-  updatePost,
 } from './post-service'
 
 export const POST_KEYS = {
@@ -54,22 +52,6 @@ export function useDeletePost() {
     mutationFn: (postId: string) => deletePost(postId),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: POST_KEYS.all })
-    },
-  })
-}
-
-export function useUpdatePost() {
-  const queryClient = useQueryClient()
-  const { session } = useAuth()
-
-  return useMutation({
-    mutationFn: ({ postId, input }: { postId: string; input: UpdatePostInput }) => {
-      if (!session) throw new Error('Must be signed in to update a post.')
-      return updatePost(postId, input)
-    },
-    onSuccess: (_data, variables) => {
-      void queryClient.invalidateQueries({ queryKey: POST_KEYS.all })
-      void queryClient.invalidateQueries({ queryKey: POST_KEYS.detail(variables.postId) })
     },
   })
 }

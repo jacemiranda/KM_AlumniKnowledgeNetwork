@@ -6,7 +6,7 @@ export function ProtectedRoute() {
   const location = useLocation()
 
   if (status === 'loading') {
-    return null
+    return <div className="min-h-screen bg-ink-950 p-6 text-slate-100">Loading session...</div>
   }
 
   if (!session) {

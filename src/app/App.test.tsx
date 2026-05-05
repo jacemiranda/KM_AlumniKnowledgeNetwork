@@ -91,7 +91,7 @@ describe('App Supabase auth flow', () => {
     render(<App />)
 
     expect(
-      await screen.findByRole('heading', { name: /^sign in$/i }),
+      await screen.findByRole('heading', { name: /sign in to alumni knowledge network/i }),
     ).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /sign in with google/i }),

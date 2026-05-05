@@ -4,102 +4,93 @@ import { getSupabaseClient } from '../../lib/supabase'
 
 export type VoteValue = 1 | -1
 
-export type PostVoteRow = {
+export type VoteRow = {
   id: string
   voter_id: string
-  post_id: string
+  target_id: string
   value: VoteValue
   created_at: string
 }
 
-export type CommentVoteRow = {
-  id: string
-  voter_id: string
-  comment_id: string
-  value: VoteValue
-  created_at: string
-}
+// ── Queries ────────────────────────────────────────────────────────────
 
-// ── Posts ────────────────────────────────────────────────────────────
-
-export async function castPostVote(
+/**
+ * Cast or update a vote on another user.
+ * Uses upsert on the (voter_id, target_id) unique constraint.
+ */
+export async function castVote(
   voterId: string,
-  postId: string,
+  targetId: string,
   value: VoteValue,
 ): Promise<void> {
   const supabase = getSupabaseClient()
+
   const { error } = await supabase
-    .from('post_votes')
+    .from('votes')
     .upsert(
-      { voter_id: voterId, post_id: postId, value },
-      { onConflict: 'post_id,voter_id' },
+      { voter_id: voterId, target_id: targetId, value },
+      { onConflict: 'voter_id,target_id' },
     )
-  if (error) throw new Error(error.message)
+
+  if (error) {
+    throw new Error(error.message)
+  }
 }
 
-export async function removePostVote(voterId: string, postId: string): Promise<void> {
+/**
+ * Remove own vote on a target user.
+ */
+export async function removeVote(voterId: string, targetId: string): Promise<void> {
   const supabase = getSupabaseClient()
+
   const { error } = await supabase
-    .from('post_votes')
+    .from('votes')
     .delete()
     .eq('voter_id', voterId)
-    .eq('post_id', postId)
-  if (error) throw new Error(error.message)
+    .eq('target_id', targetId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
 }
 
-export async function fetchMyPostVote(
+/**
+ * Get the authority score (net votes) for a single profile.
+ */
+export async function fetchAuthorityScore(profileId: string): Promise<number> {
+  const supabase = getSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('votes')
+    .select('value')
+    .eq('target_id', profileId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return (data ?? []).reduce((sum: number, row: { value: number }) => sum + row.value, 0)
+}
+
+/**
+ * Get the current user's vote on a specific target user, if any.
+ */
+export async function fetchMyVote(
   voterId: string,
-  postId: string,
+  targetId: string,
 ): Promise<VoteValue | null> {
   const supabase = getSupabaseClient()
+
   const { data, error } = await supabase
-    .from('post_votes')
+    .from('votes')
     .select('value')
     .eq('voter_id', voterId)
-    .eq('post_id', postId)
+    .eq('target_id', targetId)
     .maybeSingle()
-  if (error) throw new Error(error.message)
-  return data ? (data.value as VoteValue) : null
-}
 
-// ── Comments ─────────────────────────────────────────────────────────
+  if (error) {
+    throw new Error(error.message)
+  }
 
-export async function castCommentVote(
-  voterId: string,
-  commentId: string,
-  value: VoteValue,
-): Promise<void> {
-  const supabase = getSupabaseClient()
-  const { error } = await supabase
-    .from('comment_votes')
-    .upsert(
-      { voter_id: voterId, comment_id: commentId, value },
-      { onConflict: 'comment_id,voter_id' },
-    )
-  if (error) throw new Error(error.message)
-}
-
-export async function removeCommentVote(voterId: string, commentId: string): Promise<void> {
-  const supabase = getSupabaseClient()
-  const { error } = await supabase
-    .from('comment_votes')
-    .delete()
-    .eq('voter_id', voterId)
-    .eq('comment_id', commentId)
-  if (error) throw new Error(error.message)
-}
-
-export async function fetchMyCommentVote(
-  voterId: string,
-  commentId: string,
-): Promise<VoteValue | null> {
-  const supabase = getSupabaseClient()
-  const { data, error } = await supabase
-    .from('comment_votes')
-    .select('value')
-    .eq('voter_id', voterId)
-    .eq('comment_id', commentId)
-    .maybeSingle()
-  if (error) throw new Error(error.message)
   return data ? (data.value as VoteValue) : null
 }
