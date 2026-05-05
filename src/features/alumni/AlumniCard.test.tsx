@@ -34,6 +34,7 @@ function renderAlumniCard() {
           }
         />
         <Route path="/search" element={<div>Search page</div>} />
+        <Route path="/profile/:userId" element={<div>Profile page</div>} />
       </Routes>
     </MemoryRouter>,
   )
@@ -44,14 +45,14 @@ describe('AlumniCard', () => {
     mockUseUserBadges.mockReturnValue({ data: [], isLoading: false })
   })
 
-  it('navigates to search when Ask a Question is clicked', async () => {
+  it('renders card content and navigates to profile on click', async () => {
     renderAlumniCard()
 
     expect(screen.getByRole('heading', { name: /avery alumni/i })).toBeInTheDocument()
-    expect(screen.getByText('Helpful mentor')).toBeInTheDocument()
+    expect(screen.getByText('Frontend mentor')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /ask a question/i }))
+    fireEvent.click(screen.getByRole('link', { name: /avery alumni/i }))
 
-    expect(screen.getByText('Search page')).toBeInTheDocument()
+    expect(screen.getByText('Profile page')).toBeInTheDocument()
   })
 })

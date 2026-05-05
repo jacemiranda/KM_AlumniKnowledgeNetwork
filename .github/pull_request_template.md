@@ -1,3 +1,13 @@
+<!--
+Use the exact PR title from docs/project/ROLE_PR_MAP.md.
+
+Required title format:
+PR-XX: Exact Title From ROLE_PR_MAP
+
+Example:
+PR-01: Posts Comments and Tags
+-->
+
 **Branch:** `branch-name-here`
 
 ---
@@ -5,6 +15,7 @@
 ## What Changed?
 
 - Describe the first main change
+  - Add sub-detail if needed
   - Add sub-detail if needed
 - Describe the second main change
 - Describe the third main change if needed
@@ -29,15 +40,3 @@
 - Test edge cases or blocked actions
   - Expected result here
 - Verify unauthorized or invalid actions are blocked
-
----
-
-## PR Checklist
-
-- [ ] Branch created from `dev`
-- [ ] Branch name matches `docs/project/ROLE_PR_MAP.md`
-- [ ] PR title matches `docs/project/ROLE_PR_MAP.md` exactly (`PR-XX: Exact Title`)
-- [ ] PR body uses this template
-- [ ] No `.env` files or secrets committed
-- [ ] All Vitest tests pass (if applicable)
-- [ ] Merge target is `dev` — never directly to `main`

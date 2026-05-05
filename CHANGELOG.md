@@ -4,6 +4,11 @@ All notable project changes should be recorded here.
 
 ## Unreleased
 
+- Added M5 Sprint 1 PR-02: README Contributing Revised.
+  - Revised `README.md` with setup guide (prerequisites, clone, env vars, database migrations, dev server), available scripts table, project structure tree, and organized documentation references.
+  - Revised `CONTRIBUTING.md` with pre-reading checklist, branch prefix table, database/migration rules, reviewer checklist, AI agent usage guide, and pre-PR verification steps.
+  - Created M5 prompt log entry for this PR.
+
 - Added Sprint 3 PR-03: Deploy and Hardening Revised.
   - Added Vercel deployment config with Vite build settings and SPA route rewrites.
   - Added `npm run verify:deploy` for lint, tests, and production build verification.
@@ -66,10 +71,6 @@ All notable project changes should be recorded here.
 - Added Sprint 2 PR-04 architecture documentation for search, voting, authority score, and profile metrics decisions.
 
 ## Sprint 1 - Foundation
-
-- Added M1 PR-02: Decision Log and Standups Revised.
-  - Completed `docs/decision-log.md` with five approved decisions: SECI retention, comments-based interaction, OAuth-only auth, feed-first UX, and simplified MVP scope.
-  - Created `docs/standups/week-01-standup.md` with Week 1 member updates, decisions confirmed, risks, and next actions.
 
 - OAuth authentication, first-time profile setup, field and skill taxonomy, feed foundation, and SECI setup.
 

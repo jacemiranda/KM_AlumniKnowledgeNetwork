@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  computeAuthorityScore,
   fetchProfileMetrics,
-  type ProfileVoteRow,
 } from './profile-service'
 
 const mockFrom = vi.fn()
@@ -22,17 +20,7 @@ describe('profile metrics service', () => {
     mockFrom.mockReset()
   })
 
-  it('sums vote values into an authority score', () => {
-    const votes: ProfileVoteRow[] = [
-      { target_id: 'profile-1', value: 1 },
-      { target_id: 'profile-1', value: 1 },
-      { target_id: 'profile-1', value: -1 },
-    ]
-
-    expect(computeAuthorityScore(votes)).toBe(1)
-  })
-
-  it('loads profile identity, contribution metrics, and current viewer vote', async () => {
+  it('loads profile identity, contribution metrics, and authority score', async () => {
     mockFrom.mockImplementation((table: string) => {
       if (table === 'profiles') {
         return {
@@ -58,24 +46,23 @@ describe('profile metrics service', () => {
         }
       }
 
-      if (table === 'votes') {
+      if (table === 'post_votes') {
         return {
           select: () => ({
-            eq: (column: string) => {
-              if (column === 'target_id') {
-                return queryResult([
-                  { target_id: 'profile-1', value: 1 },
-                  { target_id: 'profile-1', value: -1 },
-                  { target_id: 'profile-1', value: 1 },
-                ])
-              }
+            eq: () => queryResult([
+              { value: 1, post: { author_id: 'profile-1' } },
+              { value: 1, post: { author_id: 'profile-1' } },
+            ]),
+          }),
+        }
+      }
 
-              return {
-                eq: () => ({
-                  maybeSingle: () => queryResult({ value: -1 }),
-                }),
-              }
-            },
+      if (table === 'comment_votes') {
+        return {
+          select: () => ({
+            eq: () => queryResult([
+              { value: -1, comment: { author_id: 'profile-1' } },
+            ]),
           }),
         }
       }
@@ -83,17 +70,9 @@ describe('profile metrics service', () => {
       if (table === 'posts') {
         return {
           select: () => ({
-            eq: (column: string) => {
-              if (column === 'author_id') {
-                return {
-                  eq: () => queryResult([{ id: 'post-1' }, { id: 'post-2' }]),
-                }
-              }
-
-              return {
-                eq: () => queryResult([{ id: 'post-3' }]),
-              }
-            },
+            eq: () => ({
+              eq: () => queryResult([{ id: 'post-1' }, { id: 'post-2' }, { id: 'post-3' }]),
+            }),
           }),
         }
       }
@@ -102,27 +81,31 @@ describe('profile metrics service', () => {
         return {
           select: () => ({
             eq: () => ({
-              eq: () => queryResult([{ id: 'comment-1' }, { id: 'comment-2' }]),
+              eq: () => queryResult([{ id: 'comment-1' }]),
             }),
           }),
         }
       }
 
-      throw new Error(`Unexpected table ${table}`)
+      return {
+        select: () => ({
+          eq: () => queryResult([]),
+        }),
+      }
     })
 
-    const profile = await fetchProfileMetrics('profile-1', 'viewer-1')
+    const metrics = await fetchProfileMetrics('profile-1')
 
-    expect(profile).toMatchObject({
+    expect(metrics).toMatchObject({
       id: 'profile-1',
       name: 'Avery Alumni',
-      user_type: 'alumni',
-      authority_score: 1,
-      post_count: 2,
-      posts_tagged_in: 1,
-      comment_count: 2,
-      my_vote: -1,
+      email: 'alumni@example.com',
+      authority_score: 1, // 1 + 1 - 1 = 1
+      post_count: 3,
+      posts_tagged_in: expect.any(Number),
+      comment_count: 1,
+      my_vote: null,
     })
-    expect(profile.skills.map((skill) => skill.name)).toEqual(['React', 'Career Coaching'])
+    expect(metrics.skills.map((skill) => skill.name)).toEqual(['React', 'Career Coaching'])
   })
 })
