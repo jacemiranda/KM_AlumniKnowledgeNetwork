@@ -7,7 +7,6 @@ import { EditPostForm } from './EditPostForm'
 import { useDeletePost, usePost } from './use-posts'
 import { useCastPostVote, useRemovePostVote } from './use-votes'
 import type { VoteValue } from './vote-service'
-import { FeedSurface } from './feed-ui'
 
 function timeAgo(dateStr: string): string {
   const now = Date.now()
@@ -34,15 +33,15 @@ export function PostDetail() {
 
   if (isLoading) {
     return (
-      <FeedSurface className="p-8">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-liquid backdrop-blur-2xl">
         <p className="text-sm text-slate-400">Loading post...</p>
-      </FeedSurface>
+      </div>
     )
   }
 
   if (error || !post) {
     return (
-      <FeedSurface className="p-8">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-liquid backdrop-blur-2xl">
         <p className="text-sm text-red-400">
           {error instanceof Error ? error.message : 'Post not found.'}
         </p>
@@ -52,7 +51,7 @@ export function PostDetail() {
         >
           ← Back to feed
         </Link>
-      </FeedSurface>
+      </div>
     )
   }
 
@@ -88,7 +87,7 @@ export function PostDetail() {
       </Link>
 
       {/* Post card */}
-      <article className="rounded-[32px] border border-white/10 bg-[#131b2e]/60 p-5 shadow-liquid backdrop-blur-2xl md:p-6">
+      <article className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-liquid backdrop-blur-2xl">
         {/* Author */}
         <header className="mb-4 flex items-start justify-between gap-3">
           <Link to={`/profile/${author?.id}`} className="group flex items-center gap-3">
@@ -273,9 +272,9 @@ export function PostDetail() {
       </article>
 
       {/* Comments thread */}
-      <FeedSurface className="p-5 md:p-6">
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-liquid backdrop-blur-2xl">
         <CommentThread postId={post.id} />
-      </FeedSurface>
+      </section>
     </div>
   )
 }
