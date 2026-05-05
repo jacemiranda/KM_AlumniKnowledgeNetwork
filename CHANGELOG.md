@@ -4,6 +4,11 @@ All notable project changes should be recorded here.
 
 ## Unreleased
 
+- Added M5 Sprint 3 PR-04: QA Reflection and Signoff Revised.
+  - Created `docs/qa-reflection.md` with comprehensive QA reflection covering Sprint 3 testing scope (9 pages, 4 role flows), quality checks, key findings (strengths, observations, no critical blockers), process improvements, and lessons learned across the 6-week MVP cycle.
+  - Created `docs/final-qa-signoff.md` with formal QA sign-off document verifying all acceptance criteria met, role-based access working, core features functional, technical requirements satisfied, and deployment readiness confirmed.
+  - Updated M5 prompt log with Entries 10-11 documenting AI-assisted creation of QA reflection and final sign-off documents, including output synthesis, cross-verification with test evidence, and manual formatting adjustments.
+
 - Added M5 Sprint 3 PR-03: Failure Analysis Report Revised.
   - Created `docs/failure-analysis-report.md` analyzing scope creep, authentication complexity, navigation UX, and database design lessons.
 
