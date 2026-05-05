@@ -188,3 +188,65 @@ export async function updateCurrentProfile(
   const { error: insertError } = await insertQuery
   assertNoError(insertError, 'Unable to save profile skills.')
 }
+
+/**
+ * Update profile fields without marking setup as complete.
+ * Used for profile editing after initial setup.
+ */
+export async function updateProfile(
+  client: SupabaseProfileClient,
+  userId: string,
+  input: {
+    name?: string
+    bio?: string | null
+    fieldId?: string
+    profilePictureUrl?: string | null
+    skillIds?: string[]
+  },
+) {
+  // Update profile fields
+  const updateData: Record<string, unknown> = {}
+  if (input.name !== undefined) updateData.name = input.name
+  if (input.bio !== undefined) updateData.bio = input.bio || null
+  if (input.fieldId !== undefined) updateData.field_id = input.fieldId
+  if (input.profilePictureUrl !== undefined) updateData.profile_picture_url = input.profilePictureUrl || null
+
+  if (Object.keys(updateData).length > 0) {
+    const updateQuery = table(client, 'profiles').update?.(updateData).eq('id', userId)
+
+    if (!updateQuery) {
+      throw new Error('Profile update is not available.')
+    }
+
+    const { error: updateError } = await updateQuery
+    assertNoError(updateError, 'Unable to update profile.')
+  }
+
+  // Update skills if provided
+  if (input.skillIds !== undefined) {
+    const deleteQuery = table(client, 'profile_skills').delete?.().eq('profile_id', userId)
+
+    if (!deleteQuery) {
+      throw new Error('Profile skill delete is not available.')
+    }
+
+    const { error: deleteError } = await deleteQuery
+    assertNoError(deleteError, 'Unable to update profile skills.')
+
+    if (input.skillIds.length > 0) {
+      const insertQuery = table(client, 'profile_skills').insert?.(
+        input.skillIds.map((skillId) => ({
+          profile_id: userId,
+          skill_id: skillId,
+        })),
+      )
+
+      if (!insertQuery) {
+        throw new Error('Profile skill insert is not available.')
+      }
+
+      const { error: insertError } = await insertQuery
+      assertNoError(insertError, 'Unable to save profile skills.')
+    }
+  }
+}

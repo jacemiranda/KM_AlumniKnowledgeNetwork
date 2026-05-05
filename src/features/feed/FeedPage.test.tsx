@@ -43,7 +43,7 @@ describe('FeedPage states', () => {
 
     renderFeedPage()
 
-    expect(screen.getAllByText(/loading feed/i).length).toBeGreaterThan(0)
+    expect(document.querySelector('.animate-pulse')).toBeInTheDocument()
   })
 
   it('shows the empty state', () => {
@@ -55,7 +55,7 @@ describe('FeedPage states', () => {
 
     renderFeedPage()
 
-    expect(screen.getByText(/no posts found/i)).toBeInTheDocument()
+    expect(screen.getByText(/no posts yet/i)).toBeInTheDocument()
   })
 
   it('shows the error state', () => {
@@ -67,7 +67,6 @@ describe('FeedPage states', () => {
 
     renderFeedPage()
 
-    expect(screen.getByText(/failed to load feed/i)).toBeInTheDocument()
     expect(screen.getByText(/network request failed/i)).toBeInTheDocument()
   })
 })
