@@ -169,25 +169,31 @@ Deliverable: ADRs, changelog updates, and technical reflection notes.
 ### M3 - UX/UI Designer / Front-End Contributor
 
 #### PR-01
-Title: `PR-01: Universal Feed Posting UI`
+Title: `PR-01: Update Stitch Agent Rules`
+Branch: `chore/update-stitch-agent-rules`
+Target: `dev`
+Deliverable: Authorize AI Agent to use Stitch API for M3 UI generation.
+
+#### PR-02
+Title: `PR-02: Universal Feed Posting UI`
 Branch: `feat/ui-universal-feed-posting`
 Target: `dev`
 Deliverable: Feed, composer, filters, and comments UI.
 
-#### PR-02
-Title: `PR-02: Search and Alumni Page UI`
+#### PR-03
+Title: `PR-03: Search and Alumni Page UI`
 Branch: `feat/ui-search-and-alumni-page`
 Target: `dev`
 Deliverable: Search results and alumni discovery UI.
 
-#### PR-03
-Title: `PR-03: Profile Leaderboard Notifications UI`
+#### PR-04
+Title: `PR-04: Profile Leaderboard Notifications UI`
 Branch: `feat/ui-profile-leaderboard-notifications`
 Target: `dev`
 Deliverable: Profile metrics, leaderboard, and notifications modal UI.
 
-#### PR-04
-Title: `PR-04: Design Rationale Sprint 2 Revised`
+#### PR-05
+Title: `PR-05: Design Rationale Sprint 2 Revised`
 Branch: `docs/design-rationale-sprint2-revised`
 Target: `dev`
 Deliverable: Navigation, authority display, and SECI-aligned UI rationale.

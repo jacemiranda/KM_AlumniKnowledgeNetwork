@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import type { AppRole } from '../auth/profile-service'
 import type { ContentStatus } from '../feed/post-service'
 import { AnalyticsSummary } from '../analytics/AnalyticsSummary'
+import { ModerationQueue, type ModerationQueueItem } from './components/ModerationQueue'
+import { UserManagementTable } from './components/UserManagementTable'
 import {
   useAllUsers,
   useAllFields,
@@ -54,22 +56,22 @@ export function UserManagementPage() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-2 overflow-x-auto rounded-2xl border border-white/10 bg-white/5 p-2 shadow-liquid backdrop-blur-2xl">
+      <nav aria-label="User Management Tabs" className="flex gap-2 overflow-x-auto rounded-2xl border border-white/10 bg-white/5 p-2 shadow-liquid backdrop-blur-2xl">
         {TABS.map((tab) => (
           <button
             key={tab}
             type="button"
             onClick={() => setActiveTab(tab)}
-            className={`rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition cursor-pointer ${
+            className={`rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4edea3] ${
               activeTab === tab
-                ? 'border border-emerald-300/40 bg-emerald-300/15 text-emerald-100'
-                : 'border border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border border-[#4edea3]/40 bg-[#4edea3]/15 text-[#dae2fd]'
+                : 'border border-transparent text-[#bbcabf] hover:text-[#dae2fd] hover:bg-white/5'
             }`}
           >
             {tab}
           </button>
         ))}
-      </div>
+      </nav>
 
       {/* Tab content */}
       {activeTab === 'Users' && <UsersTab />}
@@ -100,12 +102,15 @@ function UsersTab() {
       <div className="flex gap-3">
         <input
           type="text"
+          aria-label="Search users"
           value={search}
           onChange={(e) => { setSearch(e.target.value); setFilters((f: UserFilters) => ({ ...f, page: 1 })) }}
           placeholder="Search by name or email..."
-          className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder-slate-500 outline-none focus:border-emerald-300/40"
+          className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-[#dae2fd] placeholder-slate-500 outline-none focus:border-[#4edea3]/40 focus:ring-2 focus:ring-[#4edea3] transition-all duration-300 hover:bg-white/10"
         />
         <select
+          aria-label="Filter by role"
+          aria-expanded="false"
           value={filters.role ?? ''}
           onChange={(e) => setFilters((f: UserFilters) => ({ ...f, role: (e.target.value || '') as AppRole | '', page: 1 }))}
           className="custom-select rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 outline-none cursor-pointer"
@@ -116,6 +121,8 @@ function UsersTab() {
           <option value="admin">Admin</option>
         </select>
         <select
+          aria-label="Filter by status"
+          aria-expanded="false"
           value={filters.status ?? ''}
           onChange={(e) => setFilters((f: UserFilters) => ({ ...f, status: (e.target.value || '') as 'active' | 'blocked' | '', page: 1 }))}
           className="custom-select rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 outline-none cursor-pointer"
@@ -206,11 +213,54 @@ function UsersTab() {
   )
 }
 
-// ── Content Tab ────────────────────────────────────────────────────────
+// ── Moderation Queue Tab ──────────────────────────────────────────────
 
-function ContentTab() {
+function moderationReason(status: ContentStatus, kind: 'post' | 'comment') {
+  if (status === 'hidden') {
+    return kind === 'post' ? 'Flagged for review by moderation policy.' : 'Temporarily hidden after a report.'
+  }
+
+  if (status === 'removed') {
+    return kind === 'post' ? 'Removed due to guideline violation.' : 'Removed due to repeated reports.'
+  }
+
+  return kind === 'post' ? 'Reported as potentially misleading content.' : 'Reported for inappropriate tone.'
+}
+
+function ModerationQueueTab() {
   const [contentType, setContentType] = useState<'posts' | 'comments'>('posts')
   const [filters, setFilters] = useState<ContentFilters>({ page: 1, limit: 15 })
+  const postsQuery = useManagedPosts(filters)
+  const commentsQuery = useManagedComments(filters)
+  const modPost = useModeratePost()
+  const restPost = useRestorePost()
+  const modComment = useModerateComment()
+  const restComment = useRestoreComment()
+
+  const queueItems: ModerationQueueItem[] = contentType === 'posts'
+    ? (postsQuery.data?.posts ?? []).map((post) => ({
+      id: post.id,
+      kind: 'post',
+      title: post.title,
+      content: post.content,
+      reason: moderationReason(post.status, 'post'),
+      status: post.status,
+      byline: `by ${post.author?.name ?? 'Unknown'} · ${new Date(post.created_at).toLocaleDateString()}`,
+    }))
+    : (commentsQuery.data?.comments ?? []).map((comment) => ({
+      id: comment.id,
+      kind: 'comment',
+      title: 'Reported Comment',
+      content: comment.content,
+      reason: moderationReason(comment.status, 'comment'),
+      status: comment.status,
+      byline: `by ${comment.author?.name ?? 'Unknown'} · ${new Date(comment.created_at).toLocaleDateString()}`,
+    }))
+
+  const isLoading = contentType === 'posts' ? postsQuery.isLoading : commentsQuery.isLoading
+  const isMutating = modPost.isPending || restPost.isPending || modComment.isPending || restComment.isPending
+
+  const total = contentType === 'posts' ? (postsQuery.data?.total ?? 0) : (commentsQuery.data?.total ?? 0)
 
   return (
     <div className="space-y-4">
@@ -220,14 +270,16 @@ function ContentTab() {
             key={t}
             type="button"
             onClick={() => { setContentType(t); setFilters({ page: 1, limit: 15 }) }}
-            className={`rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition cursor-pointer ${
-              contentType === t ? 'border border-blue-300/40 bg-blue-300/15 text-blue-100' : 'border border-transparent text-slate-400 hover:text-slate-200'
+            className={`rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4edea3] ${
+              contentType === t ? 'border border-[#4edea3]/40 bg-[#4edea3]/15 text-[#dae2fd]' : 'border border-transparent text-[#bbcabf] hover:text-[#dae2fd] hover:bg-white/5'
             }`}
           >
-            {t}
+            {t === 'posts' ? 'Reported Posts' : 'Reported Comments'}
           </button>
         ))}
         <select
+          aria-label="Filter by status"
+          aria-expanded="false"
           value={filters.status ?? ''}
           onChange={(e) => setFilters((f: ContentFilters) => ({ ...f, status: (e.target.value || '') as ContentStatus | '', page: 1 }))}
           className="custom-select ml-auto rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 outline-none cursor-pointer"
@@ -239,17 +291,27 @@ function ContentTab() {
         </select>
       </div>
 
-      {contentType === 'posts' ? <PostsSubTab filters={filters} setFilters={setFilters} /> : <CommentsSubTab filters={filters} setFilters={setFilters} />}
-    </div>
-  )
-}
+      <ModerationQueue
+        items={queueItems}
+        isLoading={isLoading}
+        isMutating={isMutating}
+        onApproveKeep={(item) => {
+          if (item.kind === 'post') {
+            restPost.mutate({ postId: item.id, reason: 'Approved and kept visible' })
+            return
+          }
 
-function PostsSubTab({ filters, setFilters }: { filters: ContentFilters; setFilters: React.Dispatch<React.SetStateAction<ContentFilters>> }) {
-  const { data, isLoading } = useManagedPosts(filters)
-  const modPost = useModeratePost()
-  const restPost = useRestorePost()
-  const posts = data?.posts ?? []
-  const total = data?.total ?? 0
+          restComment.mutate({ commentId: item.id, reason: 'Approved and kept visible' })
+        }}
+        onRemoveDelete={(item) => {
+          if (item.kind === 'post') {
+            modPost.mutate({ postId: item.id, action: 'removed', reason: 'Removed from moderation queue' })
+            return
+          }
+
+          modComment.mutate({ commentId: item.id, action: 'removed', reason: 'Removed from moderation queue' })
+        }}
+      />
 
   return (
     <div className="space-y-3">
@@ -579,56 +641,15 @@ function LogTab() {
 
 // ── Shared components ──────────────────────────────────────────────────
 
-function RoleBadge({ role }: { role: AppRole }) {
-  const styles: Record<AppRole, string> = {
-    admin: 'border-purple-300/40 bg-purple-300/10 text-purple-200',
-    moderator: 'border-blue-300/40 bg-blue-300/10 text-blue-200',
-    end_user: 'border-white/10 bg-white/5 text-slate-400',
-  }
-  return <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase ${styles[role]}`}>{role.replace('_', ' ')}</span>
-}
-
-function StatusBadge({ status }: { status: string }) {
-  return (
-    <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase ${
-      status === 'active' ? 'border-emerald-300/40 bg-emerald-300/10 text-emerald-200' : 'border-red-300/40 bg-red-300/10 text-red-200'
-    }`}>
-      {status}
-    </span>
-  )
-}
-
-function ContentStatusBadge({ status }: { status: ContentStatus }) {
-  const map: Record<ContentStatus, string> = {
-    published: 'border-emerald-300/40 bg-emerald-300/10 text-emerald-200',
-    hidden: 'border-amber-300/40 bg-amber-300/10 text-amber-200',
-    removed: 'border-red-300/40 bg-red-300/10 text-red-200',
-  }
-  return <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase ${map[status]}`}>{status}</span>
-}
-
-function ActionBtn({ label, color, onClick, disabled }: { label: string; color: 'emerald' | 'amber' | 'red'; onClick: () => void; disabled: boolean }) {
-  const styles: Record<string, string> = {
-    emerald: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20',
-    amber: 'border-amber-400/30 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20',
-    red: 'border-red-400/30 bg-red-400/10 text-red-300 hover:bg-red-400/20',
-  }
-  return (
-    <button type="button" onClick={onClick} disabled={disabled} className={`rounded-lg border px-3 py-1 text-[10px] font-bold transition cursor-pointer disabled:opacity-40 ${styles[color]}`}>
-      {label}
-    </button>
-  )
-}
-
 function Pagination({ page, total, limit, onChange }: { page: number; total: number; limit: number; onChange: (p: number) => void }) {
   const totalPages = Math.ceil(total / limit)
   return (
     <div className="flex justify-center gap-3 pt-2">
-      <button type="button" disabled={page <= 1} onClick={() => onChange(page - 1)} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300 transition hover:bg-white/10 disabled:opacity-30 cursor-pointer">
+      <button type="button" aria-label="Previous Page" disabled={page <= 1} onClick={() => onChange(page - 1)} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-[#dae2fd] transition-all duration-300 hover:bg-white/10 disabled:opacity-30 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4edea3]">
         ← Prev
       </button>
-      <span className="px-2 py-2 text-xs text-slate-500">Page {page} of {totalPages}</span>
-      <button type="button" disabled={page >= totalPages} onClick={() => onChange(page + 1)} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300 transition hover:bg-white/10 disabled:opacity-30 cursor-pointer">
+      <span className="px-2 py-2 text-xs text-[#bbcabf]">Page {page} of {totalPages}</span>
+      <button type="button" aria-label="Next Page" disabled={page >= totalPages} onClick={() => onChange(page + 1)} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-[#dae2fd] transition-all duration-300 hover:bg-white/10 disabled:opacity-30 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4edea3]">
         Next →
       </button>
     </div>
