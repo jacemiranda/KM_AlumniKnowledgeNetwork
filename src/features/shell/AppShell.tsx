@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
 import { NotificationsDropdown } from '../notifications/NotificationsDropdown'
 import { SearchBar } from '../search/SearchBar'
@@ -8,7 +8,6 @@ const baseLinks = [
   { to: '/', label: 'Feed' },
   { to: '/search', label: 'Search' },
   { to: '/alumni', label: 'Alumni' },
-  { to: '/profile', label: 'Profile' },
   { to: '/leaderboard', label: 'Leaderboard' },
 ]
 
@@ -16,6 +15,7 @@ export function AppShell() {
   const { session, profile, signOut } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const headerRef = useRef<HTMLElement | null>(null)
   const mainRef = useRef<HTMLElement | null>(null)
   const [isScrolledPast, setIsScrolledPast] = useState(false)
@@ -77,7 +77,11 @@ export function AppShell() {
   function renderTopBarContent() {
     return (
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={() => navigate('/profile')}
+          className="flex items-center gap-4 cursor-pointer transition hover:opacity-75"
+        >
           {profile?.profilePictureUrl ? (
             <img
               src={profile.profilePictureUrl}
@@ -89,14 +93,14 @@ export function AppShell() {
               <span className="text-xl font-bold uppercase">{session.user.name.charAt(0)}</span>
             </div>
           )}
-          <div>
+          <div className="text-left">
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Authenticated</p>
             <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
             <p className="text-sm text-slate-300">
               {session.user.userType ?? 'profile pending'} - {session.user.email}
             </p>
           </div>
-        </div>
+        </button>
 
         <div className="flex items-center gap-3">
           <NotificationsDropdown />
@@ -108,7 +112,11 @@ export function AppShell() {
   function renderFloatingHeaderContent() {
     return (
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={() => navigate('/profile')}
+          className="flex items-center gap-4 cursor-pointer transition hover:opacity-75"
+        >
           {profile?.profilePictureUrl ? (
             <img
               src={profile.profilePictureUrl}
@@ -120,14 +128,14 @@ export function AppShell() {
               <span className="text-xl font-bold uppercase">{session.user.name.charAt(0)}</span>
             </div>
           )}
-          <div>
+          <div className="text-left">
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Authenticated</p>
             <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
             <p className="text-sm text-slate-300">
               {session.user.userType ?? 'profile pending'} - {session.user.email}
             </p>
           </div>
-        </div>
+        </button>
 
         <div className="flex items-center gap-3">
           <NotificationsDropdown />
