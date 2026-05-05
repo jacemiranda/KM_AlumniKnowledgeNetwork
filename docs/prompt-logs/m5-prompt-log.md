@@ -125,3 +125,27 @@ Reflection:
 - What helped? The AI suggested edge cases I hadn't fully detailed (e.g., interrupted profile setup).
 - What did you verify? Verified that the test cases align with the Acceptance Criteria document.
 - What did you change manually? Condensed the steps to make them quicker to execute during manual QA.
+
+## Entry 6
+
+Date: 2026-05-05
+Sprint: 2
+PR: PR-01
+Tool / AI Used: AI Assistant
+
+Prompt:
+
+```text
+Generate 10 QA test cases for Sprint 2 covering feed posting, comments, search, profile metrics, and voting. Use the established TC-XXX format and ensure they align with the updated MVP scope. Save the test cases in docs/test-cases/sprint2-feed-search-voting-cases.md.
+```
+
+Output Used:
+- 10 structured test cases covering the required Sprint 2 features.
+
+Changes Made After Review:
+- Verified that features like messaging were excluded and the focus was entirely on feed interaction, search filters, and authority scoring.
+
+Reflection:
+- What helped? The AI strictly followed the template defined in Sprint 1.
+- What did you verify? Ensured that both post-level voting and profile-level voting were represented in the test cases.
+- What did you change manually? Grouped the test cases logically by feature (Feed, Comments, Search, Alumni Discovery, Voting).

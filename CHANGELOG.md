@@ -69,6 +69,9 @@ All notable project changes should be recorded here.
   - Added vote-state display, vote changing, and vote removal for profile and post-author voting flows.
   - Added focused tests for authority score computation, profile metrics loading, and profile route behavior.
 - Added Sprint 2 PR-04 architecture documentation for search, voting, authority score, and profile metrics decisions.
+- Added M5 Sprint 2 PR-01: Sprint 2 Feed Search Voting Cases.
+  - Created 10 QA test cases in `docs/test-cases/sprint2-feed-search-voting-cases.md` covering feed posting, comments, search filters, voting, and profile metrics.
+  - Updated M5 QA prompt log with Sprint 2 test case generation prompt.
 
 ## Sprint 1 - Foundation
 
