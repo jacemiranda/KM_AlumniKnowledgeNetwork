@@ -52,22 +52,22 @@ export function UserManagementPage() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-2 overflow-x-auto rounded-2xl border border-white/10 bg-white/5 p-2 shadow-liquid backdrop-blur-2xl">
+      <nav aria-label="User Management Tabs" className="flex gap-2 overflow-x-auto rounded-2xl border border-white/10 bg-white/5 p-2 shadow-liquid backdrop-blur-2xl">
         {TABS.map((tab) => (
           <button
             key={tab}
             type="button"
             onClick={() => setActiveTab(tab)}
-            className={`rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition cursor-pointer ${
+            className={`rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4edea3] ${
               activeTab === tab
-                ? 'border border-emerald-300/40 bg-emerald-300/15 text-emerald-100'
-                : 'border border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border border-[#4edea3]/40 bg-[#4edea3]/15 text-[#dae2fd]'
+                : 'border border-transparent text-[#bbcabf] hover:text-[#dae2fd] hover:bg-white/5'
             }`}
           >
             {tab}
           </button>
         ))}
-      </div>
+      </nav>
 
       {/* Tab content */}
       {activeTab === 'Users' && <UsersTab />}
@@ -98,15 +98,18 @@ function UsersTab() {
       <div className="flex gap-3">
         <input
           type="text"
+          aria-label="Search users"
           value={search}
           onChange={(e) => { setSearch(e.target.value); setFilters((f: UserFilters) => ({ ...f, page: 1 })) }}
           placeholder="Search by name or email..."
-          className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder-slate-500 outline-none focus:border-emerald-300/40"
+          className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-[#dae2fd] placeholder-slate-500 outline-none focus:border-[#4edea3]/40 focus:ring-2 focus:ring-[#4edea3] transition-all duration-300 hover:bg-white/10"
         />
         <select
+          aria-label="Filter by role"
+          aria-expanded="false"
           value={filters.role ?? ''}
           onChange={(e) => setFilters((f: UserFilters) => ({ ...f, role: (e.target.value || '') as AppRole | '', page: 1 }))}
-          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 outline-none cursor-pointer"
+          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-[#dae2fd] outline-none cursor-pointer focus:ring-2 focus:ring-[#4edea3] transition-all duration-300 hover:bg-white/10"
         >
           <option value="">All roles</option>
           <option value="end_user">End User</option>
@@ -114,9 +117,11 @@ function UsersTab() {
           <option value="admin">Admin</option>
         </select>
         <select
+          aria-label="Filter by status"
+          aria-expanded="false"
           value={filters.status ?? ''}
           onChange={(e) => setFilters((f: UserFilters) => ({ ...f, status: (e.target.value || '') as 'active' | 'blocked' | '', page: 1 }))}
-          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 outline-none cursor-pointer"
+          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-[#dae2fd] outline-none cursor-pointer focus:ring-2 focus:ring-[#4edea3] transition-all duration-300 hover:bg-white/10"
         >
           <option value="">All status</option>
           <option value="active">Active</option>
@@ -200,17 +205,19 @@ function ModerationQueueTab() {
             key={t}
             type="button"
             onClick={() => { setContentType(t); setFilters({ page: 1, limit: 15 }) }}
-            className={`rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition cursor-pointer ${
-              contentType === t ? 'border border-blue-300/40 bg-blue-300/15 text-blue-100' : 'border border-transparent text-slate-400 hover:text-slate-200'
+            className={`rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4edea3] ${
+              contentType === t ? 'border border-[#4edea3]/40 bg-[#4edea3]/15 text-[#dae2fd]' : 'border border-transparent text-[#bbcabf] hover:text-[#dae2fd] hover:bg-white/5'
             }`}
           >
             {t === 'posts' ? 'Reported Posts' : 'Reported Comments'}
           </button>
         ))}
         <select
+          aria-label="Filter by status"
+          aria-expanded="false"
           value={filters.status ?? ''}
           onChange={(e) => setFilters((f: ContentFilters) => ({ ...f, status: (e.target.value || '') as ContentStatus | '', page: 1 }))}
-          className="ml-auto rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 outline-none cursor-pointer"
+          className="ml-auto rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-[#dae2fd] outline-none cursor-pointer focus:ring-2 focus:ring-[#4edea3] transition-all duration-300 hover:bg-white/10"
         >
           <option value="">All status</option>
           <option value="published">Published</option>
@@ -274,7 +281,7 @@ function FieldsTab() {
                 type="button"
                 onClick={() => toggle.mutate({ fieldId: f.id, isActive: !f.is_active })}
                 disabled={toggle.isPending}
-                className={`rounded-lg px-3 py-1 text-[10px] font-bold transition cursor-pointer disabled:opacity-40 ${
+                className={`rounded-lg px-3 py-1 text-[10px] font-bold transition-all duration-300 cursor-pointer disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-[#4edea3] hover:opacity-80 ${
                   f.is_active
                     ? 'border border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
                     : 'border border-red-400/30 bg-red-400/10 text-red-300'
@@ -334,11 +341,11 @@ function Pagination({ page, total, limit, onChange }: { page: number; total: num
   const totalPages = Math.ceil(total / limit)
   return (
     <div className="flex justify-center gap-3 pt-2">
-      <button type="button" disabled={page <= 1} onClick={() => onChange(page - 1)} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300 transition hover:bg-white/10 disabled:opacity-30 cursor-pointer">
+      <button type="button" aria-label="Previous Page" disabled={page <= 1} onClick={() => onChange(page - 1)} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-[#dae2fd] transition-all duration-300 hover:bg-white/10 disabled:opacity-30 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4edea3]">
         ← Prev
       </button>
-      <span className="px-2 py-2 text-xs text-slate-500">Page {page} of {totalPages}</span>
-      <button type="button" disabled={page >= totalPages} onClick={() => onChange(page + 1)} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300 transition hover:bg-white/10 disabled:opacity-30 cursor-pointer">
+      <span className="px-2 py-2 text-xs text-[#bbcabf]">Page {page} of {totalPages}</span>
+      <button type="button" aria-label="Next Page" disabled={page >= totalPages} onClick={() => onChange(page + 1)} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-[#dae2fd] transition-all duration-300 hover:bg-white/10 disabled:opacity-30 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4edea3]">
         Next →
       </button>
     </div>
