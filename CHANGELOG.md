@@ -64,10 +64,11 @@ All notable project changes should be recorded here.
 
 ## Sprint 1 - Foundation
 
-- Added M1 PR-03: Sprint 1 Tracking Revised.
-  - Created `docs/sprint-tracking/sprint1-board.md` with Sprint 1 PR status table, gate criteria status, and board column mapping.
-  - Created `docs/prompt-logs/m1-prompt-log.md` with three Sprint 1 planning entries covering PR-01 through PR-03.
-  - Created three GitHub milestones: Sprint 1 - Foundation, Sprint 2 - Core Interaction, Sprint 3 - Final Release.
+- Added M1 PR-01: Repo Governance Revised.
+  - Revised `.github/pull_request_template.md` with a PR checklist aligned to the revised MVP workflow.
+  - Added `docs/github-setup/labels.md` with label definitions for type, sprint, member, status, and priority tracking.
+  - Added `docs/github-setup/board-setup.md` with board column structure, milestone definitions, issue linking convention, and Definition of Done.
+  - Updated `docs/PR-TEMPLATE.md` to reference `.github/pull_request_template.md` as the canonical template.
 
 - OAuth authentication, first-time profile setup, field and skill taxonomy, feed foundation, and SECI setup.
 
