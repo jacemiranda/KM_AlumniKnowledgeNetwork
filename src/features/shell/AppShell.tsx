@@ -152,7 +152,7 @@ export function AppShell() {
       </div>
 
       <div className="relative mx-auto grid w-full max-w-7xl gap-6 md:grid-cols-[240px_1fr] lg:grid-cols-[280px_1fr]">
-        <aside className="hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-liquid backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:border-emerald-300/40 hover:shadow-2xl hover:shadow-emerald-900/20 md:sticky md:top-6 md:block md:h-[calc(100vh-3rem)] overflow-y-auto overscroll-contain">
+        <aside className="hidden p-6 transition-all duration-300 md:sticky md:top-6 md:block md:h-[calc(100vh-3rem)] overflow-y-auto overscroll-contain">
           <div className="border-b border-white/10 pb-5">
             <Logo className="h-10" />
           </div>
@@ -169,12 +169,30 @@ export function AppShell() {
                 to={link.to}
                 end={link.to === '/'}
                 className={({ isActive }) =>
-                  isActive
-                    ? 'rounded-2xl border border-emerald-300/40 bg-emerald-300/15 px-4 py-3 text-sm font-bold text-emerald-100'
-                    : 'rounded-2xl border border-transparent bg-white/5 px-4 py-3 text-sm text-slate-300 transition hover:border-white/10 hover:text-slate-100 cursor-pointer'
+                  (isActive
+                    ? 'px-4 py-3 text-sm font-bold text-emerald-100'
+                    : 'px-4 py-3 text-sm text-slate-300 transition hover:text-slate-100 cursor-pointer') + ' group flex items-center rounded-2xl'
                 }
               >
-                {link.label}
+                {/* Icon (appears on hover) - skip icon for search to preserve component per request */}
+                {link.to !== '/search' && (
+                  <span className="mr-3 w-6 h-6 flex-shrink-0 flex items-center justify-center text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    {link.to === '/' && (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5L12 3l9 6.5"/><path d="M9 22V12h6v10"/></svg>
+                    )}
+                    {link.to === '/alumni' && (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-3-3.87"/><path d="M4 21v-2a4 4 0 0 1 3-3.87"/><path d="M16 3.13a4 4 0 1 1-8 0"/></svg>
+                    )}
+                    {link.to === '/leaderboard' && (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l2.09 6.26L20 9.27l-5 3.64L16.18 22 12 18.56 7.82 22 9 12.91l-5-3.64 5.91-.99L12 2z"/></svg>
+                    )}
+                    {link.to === '/admin' && (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l7 4v6c0 5-3.33 9-7 10-3.67-1-7-5-7-10V6l7-4z"/></svg>
+                    )}
+                  </span>
+                )}
+
+                <span>{link.label}</span>
               </NavLink>
             ))}
           </nav>
