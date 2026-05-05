@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
 import { NotificationsDropdown } from '../notifications/NotificationsDropdown'
@@ -17,6 +17,9 @@ export function AppShell() {
   const { session, profile, signOut } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const location = useLocation()
+  const headerRef = useRef<HTMLElement | null>(null)
+  const [isScrolledPast, setIsScrolledPast] = useState(false)
+  const [isFloatingVisible, setIsFloatingVisible] = useState(false)
 
   useEffect(() => {
     setIsMobileMenuOpen(false)
@@ -29,6 +32,55 @@ export function AppShell() {
 
   if (!session) {
     return null
+  }
+
+  useEffect(() => {
+    function updateScrollState() {
+      const el = headerRef.current
+      if (!el) return setIsScrolledPast(false)
+      const rect = el.getBoundingClientRect()
+      const threshold = rect.bottom + window.scrollY
+      setIsScrolledPast(window.scrollY > threshold)
+    }
+
+    updateScrollState()
+    window.addEventListener('scroll', updateScrollState, { passive: true })
+    window.addEventListener('resize', updateScrollState)
+    return () => {
+      window.removeEventListener('scroll', updateScrollState)
+      window.removeEventListener('resize', updateScrollState)
+    }
+  }, [])
+
+  function renderTopBarContent() {
+    return (
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-4">
+          {profile?.profilePictureUrl ? (
+            <img
+              src={profile.profilePictureUrl}
+              alt={session.user.name}
+              className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10 transition hover:ring-emerald-300/50"
+            />
+          ) : (
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 ring-2 ring-white/10 transition hover:ring-emerald-300/50">
+              <span className="text-xl font-bold uppercase">{session.user.name.charAt(0)}</span>
+            </div>
+          )}
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Authenticated</p>
+            <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
+            <p className="text-sm text-slate-300">
+              {session.user.userType ?? 'profile pending'} - {session.user.email}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <NotificationsDropdown />
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -79,34 +131,37 @@ export function AppShell() {
 
         <main className="flex flex-col gap-5">
           {location.pathname === '/' && (
-            <header className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-liquid backdrop-blur-2xl sm:p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-4">
-                {profile?.profilePictureUrl ? (
-                  <img
-                    src={profile.profilePictureUrl}
-                    alt={session.user.name}
-                    className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10 transition hover:ring-emerald-300/50"
-                  />
-                ) : (
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 ring-2 ring-white/10 transition hover:ring-emerald-300/50">
-                    <span className="text-xl font-bold uppercase">{session.user.name.charAt(0)}</span>
-                  </div>
-                )}
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Authenticated</p>
-                  <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
-                  <p className="text-sm text-slate-300">
-                    {session.user.userType ?? 'profile pending'} - {session.user.email}
-                  </p>
-                </div>
-              </div>
+            <>
+              {/* Inline header (original document flow) */}
+              <header ref={headerRef} className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-liquid backdrop-blur-2xl sm:p-5">
+                {renderTopBarContent()}
+              </header>
 
-              <div className="flex items-center gap-3">
-                <NotificationsDropdown />
-              </div>
-            </div>
-          </header>
+              {/* Trigger zone (appears only after header scrolls past) */}
+              {isScrolledPast && (
+                <div
+                  onMouseEnter={() => setIsFloatingVisible(true)}
+                  onMouseLeave={() => setIsFloatingVisible(false)}
+                  className="fixed top-0 left-0 w-full h-12 z-40"
+                  aria-hidden
+                />
+              )}
+
+              {/* Floating header revealed on hover of trigger zone */}
+              {isScrolledPast && (
+                <div
+                  onMouseEnter={() => setIsFloatingVisible(true)}
+                  onMouseLeave={() => setIsFloatingVisible(false)}
+                  className={`pointer-events-auto fixed top-4 left-0 right-0 z-50 mx-auto max-w-4xl transform transition-transform duration-300 ease-out ${
+                    isFloatingVisible ? 'translate-y-0' : '-translate-y-[150%]'
+                  }`}
+                >
+                  <div className="rounded-3xl border border-white/10 bg-[#131b2e]/80 backdrop-blur-2xl shadow-lg p-4 sm:p-5">
+                    {renderTopBarContent()}
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           <section>
