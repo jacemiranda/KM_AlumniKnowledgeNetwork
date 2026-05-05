@@ -68,6 +68,9 @@ All notable project changes should be recorded here.
 
 ## Sprint 2 - Core Interaction
 
+- Added M1 PR-02: Decision Log Sprint 2 Revised.
+  - Added four Sprint 2 decisions to `docs/decision-log.md`: Information and Question post types, Stitch API authorization for M3, hide/remove/block moderation action set, and five-route navigation shell structure.
+
 - Posts, comments, search, alumni discovery, voting, authority score, and notifications modal.
 
 ## Sprint 3 - Final Release
