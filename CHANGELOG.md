@@ -104,9 +104,8 @@ All notable project changes should be recorded here.
 
 ## Sprint 2 - Core Interaction
 
-- Added M1 PR-01: Standups Sprint 2 Revised.
-  - Created `docs/standups/week-03-standup.md` with Sprint 2 Week 1 member updates, blocker tracking, decisions, and next actions.
-  - Created `docs/standups/week-04-standup.md` with Sprint 2 Week 2 integration checkpoint, gate confirmation, and close-out coordination.
+- Added M1 PR-02: Decision Log Sprint 2 Revised.
+  - Added four Sprint 2 decisions to `docs/decision-log.md`: Information and Question post types, Stitch API authorization for M3, hide/remove/block moderation action set, and five-route navigation shell structure.
 
 - Posts, comments, search, alumni discovery, voting, authority score, and notifications modal.
 
