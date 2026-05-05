@@ -64,7 +64,7 @@ export function SearchBar({
       <div className="relative">
         {/* Search icon */}
         <svg
-          className={`pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`}
+          className={`pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-slate-400 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`}
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={2}

@@ -182,7 +182,7 @@ export function AppShell() {
 
           <div className="mt-8 border-t border-white/10 pt-4">
             <button
-              className="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-left text-sm font-bold text-slate-300 transition hover:border-white/30 hover:bg-white/10 hover:text-white cursor-pointer"
+              className="w-full rounded-2xl border border-red-400/20 bg-red-400/5 px-4 py-3 text-left text-sm font-bold text-red-300 transition hover:bg-red-400/10 cursor-pointer"
               onClick={signOut}
               type="button"
             >
@@ -269,6 +269,9 @@ export function AppShell() {
             className="absolute bottom-16 left-0 right-0 rounded-t-3xl border-t border-white/10 bg-ink-950 p-6 shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
+            <div className="border-b border-white/10 pb-4 mb-4">
+              <Logo className="h-8" />
+            </div>
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-sm font-bold uppercase tracking-[0.12em] text-slate-300">Menu</h2>
               <button onClick={() => setIsMobileMenuOpen(false)} className="rounded-full bg-white/5 p-2 text-slate-400 hover:text-white cursor-pointer transition">

@@ -68,6 +68,11 @@ export function SearchPage() {
         </p>
       </div>
 
+      {/* Mobile-only search bar (sidebar search is hidden below md) */}
+      <div className="md:hidden">
+        <SearchBar compact navigateOnSubmit placeholder="Quick search..." />
+      </div>
+
       {/* Tabs */}
       <div className="flex gap-1 rounded-2xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-2xl">
         {tabs.map((tab) => (
@@ -75,11 +80,10 @@ export function SearchPage() {
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] transition cursor-pointer ${
-              activeTab === tab.key
-                ? 'bg-emerald-300/15 text-emerald-100 border border-emerald-300/30'
-                : 'text-slate-400 border border-transparent hover:text-slate-200 hover:bg-white/5'
-            }`}
+            className={`flex-1 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] transition cursor-pointer ${activeTab === tab.key
+              ? 'bg-emerald-300/15 text-emerald-100 border border-emerald-300/30'
+              : 'text-slate-400 border border-transparent hover:text-slate-200 hover:bg-white/5'
+              }`}
           >
             {tab.label}
             {hasQuery && !usersLoading && !postsLoading && (
@@ -98,10 +102,7 @@ export function SearchPage() {
             </svg>
           </div>
           <p className="text-sm text-slate-400">
-            Type at least 1 character to start searching.
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Search across users, posts, fields, and skills.
+            Type to start searching.
           </p>
         </div>
       )}
@@ -204,11 +205,10 @@ function PostResultCard({ post }: { post: SearchPostResult }) {
       className="group block rounded-2xl border border-white/10 bg-white/5 p-4 shadow-liquid backdrop-blur-2xl transition hover:border-emerald-300/20 hover:bg-white/[0.08] cursor-pointer"
     >
       <div className="flex items-center gap-2 text-xs text-slate-500">
-        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-          post.post_type === 'question'
-            ? 'bg-amber-400/15 text-amber-300'
-            : 'bg-cyan-400/15 text-cyan-300'
-        }`}>
+        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${post.post_type === 'question'
+          ? 'bg-amber-400/15 text-amber-300'
+          : 'bg-cyan-400/15 text-cyan-300'
+          }`}>
           {post.post_type}
         </span>
         <span className="text-slate-600">•</span>
