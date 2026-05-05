@@ -19,11 +19,15 @@ export type PostRow = {
 }
 
 export type PostWithRelations = PostRow & {
-  author: { id: string; name: string; profile_picture_url: string | null; user_type: string | null }
+  author: { id: string; name: string; profile_picture_url: string | null; user_type: string | null; role: string }
   field: { id: string; name: string }
   post_tags: Array<{ tag: { id: string; name: string } }>
   tagged_alumni: { id: string; name: string } | null
   comment_count: number
+  authority_score: number
+  upvote_count: number
+  downvote_count: number
+  my_vote: number
 }
 
 type PostAuthor = PostWithRelations['author']
@@ -36,10 +40,39 @@ type RawPostWithRelations = PostRow & {
   field: PostField | PostField[]
   post_tags: PostTag[]
   tagged_alumni: TaggedAlumni | TaggedAlumni[] | null
+  post_votes: { value: number; voter_id: string }[] | null
 }
 
 type QueryError = {
   message: string
+}
+
+// ── Error Handling ────────────────────────────────────────────────────
+
+/**
+ * Convert database constraint violations to user-friendly messages
+ */
+function getDbErrorMessage(error: QueryError): string {
+  const msg = error.message || ''
+  
+  if (msg.includes('posts_title_check')) {
+    return 'Please provide a title for your post'
+  }
+  if (msg.includes('posts_content_check')) {
+    return 'Please provide content for your post'
+  }
+  if (msg.includes('field_id') && msg.includes('foreign key')) {
+    return 'Please select a valid field'
+  }
+  if (msg.includes('post_type')) {
+    return 'Please select a valid post type'
+  }
+  if (msg.includes('duplicate')) {
+    return 'This post already exists'
+  }
+  
+  // Default fallback
+  return 'Failed to create post. Please try again.'
 }
 
 export type CreatePostInput = {
@@ -51,10 +84,14 @@ export type CreatePostInput = {
   taggedAlumniId?: string | null
 }
 
+export type UpdatePostInput = CreatePostInput
+
 export type PostFilters = {
   fieldId?: string
   postType?: PostType
   tagId?: string
+  authorId?: string
+  taggedAlumniId?: string
   page?: number
   limit?: number
 }
@@ -72,15 +109,16 @@ const POST_SELECT = `
   status,
   created_at,
   updated_at,
-  author:profiles!posts_author_id_fkey ( id, name, profile_picture_url, user_type ),
+  author:profiles!posts_author_id_fkey ( id, name, profile_picture_url, user_type, role ),
   field:fields!posts_field_id_fkey ( id, name ),
   post_tags ( tag:tags ( id, name ) ),
-  tagged_alumni:profiles!posts_tagged_alumni_id_fkey ( id, name )
+  tagged_alumni:profiles!posts_tagged_alumni_id_fkey ( id, name ),
+  post_votes ( value, voter_id )
 `
 
 export async function fetchPosts(filters: PostFilters = {}) {
   const supabase = getSupabaseClient()
-  const { fieldId, postType, tagId, page = 1, limit = 20 } = filters
+  const { fieldId, postType, tagId, authorId, taggedAlumniId, page = 1, limit = 20 } = filters
 
   let query = supabase
     .from('posts')
@@ -95,6 +133,14 @@ export async function fetchPosts(filters: PostFilters = {}) {
 
   if (postType) {
     query = query.eq('post_type', postType)
+  }
+
+  if (authorId) {
+    query = query.eq('author_id', authorId)
+  }
+
+  if (taggedAlumniId) {
+    query = query.eq('tagged_alumni_id', taggedAlumniId)
   }
 
   if (tagId) {
@@ -121,12 +167,15 @@ export async function fetchPosts(filters: PostFilters = {}) {
     throw new Error(error.message)
   }
 
+  const { data: { user } } = await supabase.auth.getUser()
+  const currentUserId = user?.id
+
   // Attach comment counts
   const postIdList = (data ?? []).map((p: { id: string }) => p.id)
   const commentCounts = await getCommentCounts(postIdList)
 
   const posts: PostWithRelations[] = (data ?? []).map((raw) => ({
-    ...normalizePost(raw),
+    ...normalizePost(raw, currentUserId),
     comment_count: commentCounts.get(raw.id) ?? 0,
   }))
 
@@ -150,11 +199,14 @@ export async function fetchPostById(postId: string): Promise<PostWithRelations> 
     throw new Error('Post not found.')
   }
 
+  const { data: { user } } = await supabase.auth.getUser()
+  const currentUserId = user?.id
+
   // Attach comment count
   const commentCounts = await getCommentCounts([data.id])
 
   return {
-    ...normalizePost(data),
+    ...normalizePost(data, currentUserId),
     comment_count: commentCounts.get(data.id) ?? 0,
   }
 }
@@ -176,7 +228,7 @@ export async function createPost(userId: string, input: CreatePostInput) {
     .single()
 
   if (postError) {
-    throw new Error(postError.message)
+    throw new Error(getDbErrorMessage(postError))
   }
 
   // Attach tags
@@ -189,11 +241,86 @@ export async function createPost(userId: string, input: CreatePostInput) {
     const { error: tagError } = await supabase.from('post_tags').insert(tagRows)
 
     if (tagError) {
-      throw new Error(tagError.message)
+      throw new Error('Failed to attach tags. Please try again.')
+    }
+  }
+
+  // Create notification if alumni is tagged
+  if (input.taggedAlumniId && input.taggedAlumniId !== userId) {
+    try {
+      // Fetch author profile
+      const { data: authorData, error: authorError } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', userId)
+        .single()
+
+      if (authorError) throw authorError
+
+      // Create notification
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: input.taggedAlumniId,
+          type: 'tagged_in_post',
+          actor_id: userId,
+          related_post_id: post.id,
+          data: {
+            title: 'You were tagged in a post',
+            message: input.title,
+            icon_type: 'tagged',
+            action_url: `/post/${post.id}`,
+            actor_name: authorData.name,
+          },
+        })
+    } catch (notifError) {
+      // Log but don't fail the post creation if notification fails
+      console.error('Failed to create notification:', notifError)
     }
   }
 
   return post as { id: string }
+}
+
+export async function updatePost(postId: string, input: UpdatePostInput) {
+  const supabase = getSupabaseClient()
+
+  const { error: postError } = await supabase
+    .from('posts')
+    .update({
+      title: input.title,
+      content: input.content,
+      field_id: input.fieldId,
+      post_type: input.postType,
+      tagged_alumni_id: input.taggedAlumniId || null,
+    })
+    .eq('id', postId)
+
+  if (postError) {
+    throw new Error(getDbErrorMessage(postError))
+  }
+
+  const { error: deleteError } = await supabase
+    .from('post_tags')
+    .delete()
+    .eq('post_id', postId)
+
+  if (deleteError) {
+    throw new Error('Failed to update tags. Please try again.')
+  }
+
+  if (input.tagIds.length > 0) {
+    const tagRows = input.tagIds.map((tagId) => ({
+      post_id: postId,
+      tag_id: tagId,
+    }))
+
+    const { error: insertError } = await supabase.from('post_tags').insert(tagRows)
+
+    if (insertError) {
+      throw new Error('Failed to update tags. Please try again.')
+    }
+  }
 }
 
 export async function deletePost(postId: string) {
@@ -215,7 +342,15 @@ export async function deletePost(postId: string) {
  * Supabase returns FK joins as arrays for single relations.
  * This normalizes the raw row into our typed shape.
  */
-function normalizePost(raw: RawPostWithRelations): Omit<PostWithRelations, 'comment_count'> {
+function normalizePost(raw: RawPostWithRelations, currentUserId?: string): Omit<PostWithRelations, 'comment_count'> {
+  const votes = raw.post_votes ?? []
+  const authority_score = votes.reduce((sum, vote) => sum + vote.value, 0)
+  const upvote_count = votes.filter((v) => v.value === 1).length
+  const downvote_count = votes.filter((v) => v.value === -1).length
+  const my_vote = currentUserId
+    ? votes.find((v) => v.voter_id === currentUserId)?.value ?? 0
+    : 0
+
   return {
     id: raw.id,
     author_id: raw.author_id,
@@ -233,6 +368,10 @@ function normalizePost(raw: RawPostWithRelations): Omit<PostWithRelations, 'comm
     tagged_alumni: Array.isArray(raw.tagged_alumni)
       ? raw.tagged_alumni[0] ?? null
       : raw.tagged_alumni ?? null,
+    authority_score,
+    upvote_count,
+    downvote_count,
+    my_vote,
   }
 }
 

@@ -4,6 +4,10 @@ All notable project changes should be recorded here.
 
 ## Unreleased
 
+- Removed "Loading session..." flash screen from ProtectedRoute during sign-in.
+- Moved Create Post action from sidebar into the feed as an inline composer prompt with icon, label, and cancel control.
+- Cleaned up unused `useNavigate` import from AppShell.
+
 - Added Sprint 3 PR-03: Deploy and Hardening Revised.
   - Added Vercel deployment config with Vite build settings and SPA route rewrites.
   - Added `npm run verify:deploy` for lint, tests, and production build verification.
