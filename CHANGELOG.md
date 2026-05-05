@@ -68,6 +68,9 @@ All notable project changes should be recorded here.
 
 ## Sprint 2 - Core Interaction
 
+- Added M1 PR-03: Sprint 2 Board Audit Revised.
+  - Created `docs/sprint-tracking/sprint2-board.md` with Sprint 2 PR status table, gate criteria status, integration checkpoint, review readiness, open items, and confirmed demo path.
+
 - Posts, comments, search, alumni discovery, voting, authority score, and notifications modal.
 
 ## Sprint 3 - Final Release
