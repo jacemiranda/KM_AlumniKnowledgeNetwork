@@ -4,6 +4,12 @@ All notable project changes should be recorded here.
 
 ## Unreleased
 
+- Added M5 Sprint 3 PR-02: README and Wiki Final Revised.
+  - Finalized `README.md` to include links to the user guide and wiki structure.
+  - Revised `docs/wiki/structure.md` to reflect the final Sprint 3 features (Leaderboard, Moderation, Badges).
+  - Created `docs/wiki/user-guide.md` providing comprehensive instructions for Student, Alumni, Moderator, and Admin roles.
+  - Removed outdated messaging and community-approval assumptions from final documentation.
+
 - Added M5 Sprint 1 PR-02: README Contributing Revised.
   - Revised `README.md` with setup guide (prerequisites, clone, env vars, database migrations, dev server), available scripts table, project structure tree, and organized documentation references.
   - Revised `CONTRIBUTING.md` with pre-reading checklist, branch prefix table, database/migration rules, reviewer checklist, AI agent usage guide, and pre-PR verification steps.

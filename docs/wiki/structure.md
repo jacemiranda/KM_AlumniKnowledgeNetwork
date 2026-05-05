@@ -1,6 +1,6 @@
 # Wiki Structure
 
-This document outlines the proposed structure for the Alumni Knowledge Network GitHub Wiki.
+This document outlines the structure of the Alumni Knowledge Network GitHub Wiki.
 
 ## Home
 - Project Overview
@@ -11,24 +11,28 @@ This document outlines the proposed structure for the Alumni Knowledge Network G
 - Environment Setup
 - Database Initialization
 - Local Development Server
-- Using the Test Accounts
+- Configuration and Deployment
 
-## User Guides
-- **Student Guide**: Navigating the Feed, Searching, and Profile Metrics
-- **Alumni Guide**: Posting Knowledge, Tagging, and Authority Score
-- **Moderator Guide**: Managing Users and Content
+## User Guide
+- **[User Guide](./user-guide.md)**: Comprehensive guide for Student, Alumni, Moderator, and Admin roles.
+  - Student: Feed, Search, and Learning
+  - Alumni: Posting, Commenting, and Authority
+  - Moderator: User Management and Content Moderation
+  - Admin: System and Role Management
 
 ## Technical Documentation
-- **Architecture**: Tech Stack and Routing
-- **Database schema**: Profiles, Posts, Comments, Votes, and Search Vectors
+- **Architecture**: Tech Stack, Routing, and Components
+- **Database Schema**: Profiles, Posts, Comments, Votes, and Search Vectors
 - **Authentication**: Google OAuth and Session Management
 - **Search and Retrieval**: Full-Text Search and Filtering Logic
 - **Knowledge Management**: SECI implementation and Taxonomy
+- **Moderation & Analytics**: Basic Analytics, Blocking, and Content Controls
 
 ## QA & Testing
 - Sprint 1 Test Cases and Results
 - Sprint 2 Test Cases and Results
-- Known Issues and Bug Reports
+- Sprint 3 Final E2E QA and Page Map
+- Bug Reports and QA Logs
 
 ## Contributing
 - PR Workflow
