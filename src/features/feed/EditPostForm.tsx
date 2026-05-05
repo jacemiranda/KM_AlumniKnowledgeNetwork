@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useQuery } from '@tanstack/react-query'
 import { getSupabaseClient } from '../../lib/supabase'
@@ -97,7 +97,10 @@ export function EditPostForm({ postId, initialValues, onCancel, onSuccess }: Edi
     },
   })
 
-  useEffect(() => {
+  const [prevInitialValues, setPrevInitialValues] = useState(initialValues)
+
+  if (initialValues !== prevInitialValues) {
+    setPrevInitialValues(initialValues)
     reset({
       title: initialValues.title,
       content: initialValues.content,
@@ -112,7 +115,7 @@ export function EditPostForm({ postId, initialValues, onCancel, onSuccess }: Edi
         ? { id: initialValues.taggedAlumniId, name: initialValues.taggedAlumniName }
         : null,
     )
-  }, [initialValues, reset])
+  }
 
   const postType = useWatch({ control, name: 'postType' })
 

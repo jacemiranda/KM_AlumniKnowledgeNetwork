@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom'
 import type { PostFilters } from './post-service'
 import { FeedFilters } from './FeedFilters'
@@ -20,10 +20,12 @@ export function FeedPage() {
     limit: 20,
     tagId: urlTagId || undefined 
   })
+  const [prevTagId, setPrevTagId] = useState(urlTagId)
 
-  useEffect(() => {
+  if (urlTagId !== prevTagId) {
+    setPrevTagId(urlTagId)
     setFilters((f) => ({ ...f, tagId: urlTagId || undefined, page: 1 }))
-  }, [urlTagId])
+  }
   const [showComposer, setShowComposer] = useState(false)
   const isComposerOpen = showComposer || searchParams.get('compose') === 'true' || !!askAlumni
 

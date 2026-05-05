@@ -77,7 +77,7 @@ describe('NotificationsModal', () => {
   });
 
   it('renders unread notifications with emerald indicator and brighter styling', () => {
-    const { container } = render(
+    render(
       <NotificationsModal
         notifications={mockNotifications}
         unreadCount={2}
@@ -95,7 +95,7 @@ describe('NotificationsModal', () => {
   });
 
   it('renders read notifications with dimmer styling', () => {
-    const { container } = render(
+    render(
       <NotificationsModal
         notifications={mockNotifications}
         unreadCount={2}

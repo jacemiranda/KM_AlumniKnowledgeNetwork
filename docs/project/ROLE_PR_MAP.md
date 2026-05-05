@@ -288,6 +288,19 @@ Branch: `feat/ui-final-polish-revised`
 Target: `dev`
 Deliverable: Leaderboard, badges, notifications modal, and final accessibility polish.
 
+#### PR-03
+Title: `PR-03: System-Wide Animations and Refinements`
+Branch: `feat/ui-animations-and-refinements`
+Target: `dev`
+Deliverable: Tailwind CSS animations, reveal-on-hover floating top bar, and interactive micro-refinements.
+
+#### PR-04
+Title: `PR-04: Branding, Favicon, and Title Update`
+Branch: `chore/branding-and-title-update`
+Target: `dev`
+Deliverable: Converted EraLink logo to .ico favicon and updated HTML document title for production branding.
+
+
 ### M4 - Knowledge Management Analyst
 
 #### PR-01

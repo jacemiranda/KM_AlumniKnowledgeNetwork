@@ -90,9 +90,7 @@ describe('App Supabase auth flow', () => {
   it('shows the Google-only login experience when no Supabase session is present', async () => {
     render(<App />)
 
-    expect(
-      await screen.findByRole('heading', { name: /^sign in$/i }),
-    ).toBeInTheDocument()
+    expect(await screen.findByText(/eralink/i)).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /sign in with google/i }),
     ).toBeInTheDocument()

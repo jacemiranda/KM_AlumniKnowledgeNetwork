@@ -17,7 +17,7 @@ export function useSearchUsers(query: string, filters: SearchFilters = {}) {
   return useQuery({
     queryKey: SEARCH_KEYS.users(query, filters),
     queryFn: () => searchUsers(query, filters),
-    enabled: query.trim().length >= 2,
+    enabled: query.trim().length >= 1,
     staleTime: 30_000,
   })
 }
@@ -26,7 +26,7 @@ export function useSearchPosts(query: string, filters: SearchFilters = {}) {
   return useQuery({
     queryKey: SEARCH_KEYS.posts(query, filters),
     queryFn: () => searchPosts(query, filters),
-    enabled: query.trim().length >= 2,
+    enabled: query.trim().length >= 1,
     staleTime: 30_000,
   })
 }
