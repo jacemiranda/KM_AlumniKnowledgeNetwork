@@ -9,6 +9,10 @@ All notable project changes should be recorded here.
   - Revised `CONTRIBUTING.md` with pre-reading checklist, branch prefix table, database/migration rules, reviewer checklist, AI agent usage guide, and pre-PR verification steps.
   - Created M5 prompt log entry for this PR.
 
+- Added M5 Sprint 3 PR-01: Final E2E Page Map Revised.
+  - Created `docs/test-cases/sprint3-final-e2e-page-map.md` validating the final page map, role-based flows, and acceptance criteria.
+  - Updated M5 QA prompt log with Sprint 3 E2E test generation prompt.
+
 - Added Sprint 3 PR-03: Deploy and Hardening Revised.
   - Added Vercel deployment config with Vite build settings and SPA route rewrites.
   - Added `npm run verify:deploy` for lint, tests, and production build verification.
