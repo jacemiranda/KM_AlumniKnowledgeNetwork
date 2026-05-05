@@ -4,7 +4,6 @@ import { getSupabaseClient } from '../../lib/supabase'
 const BUCKET_NAME = 'profile-pictures'
 const MAX_FILE_SIZE = 1048576 // 1MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png']
-const JPEG_UPLOAD_CONTENT_TYPES = ['image/jpeg', 'image/jpg']
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -69,15 +68,6 @@ function validateFile(file: File): { valid: boolean; error?: string } {
   return { valid: true }
 }
 
-function isUnsupportedMimeTypeError(error: unknown): boolean {
-  const message = error instanceof Error ? error.message.toLowerCase() : String(error ?? '').toLowerCase()
-
-  return (
-    message.includes('mime type')
-    && message.includes('not supported')
-  ) || message.includes('invalid content type')
-}
-
 // ── Upload Functions ───────────────────────────────────────────────────
 
 /**
@@ -99,44 +89,34 @@ export async function uploadProfilePicture(userId: string, file: File): Promise<
   const filename = `${userId}_${timestamp}.${extension}`
   const filePath = `${userId}/${filename}`
 
-  const contentTypesToTry = file.type === 'image/jpeg'
-    ? JPEG_UPLOAD_CONTENT_TYPES
-    : [file.type]
-
-  let lastUploadError: unknown = null
-
   try {
-    for (const contentType of contentTypesToTry) {
-      const { data, error: uploadError } = await supabase.storage
-        .from(BUCKET_NAME)
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          contentType,
-          upsert: true,
-        })
+    // Upload file to Supabase storage
+    const { data, error: uploadError } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        contentType: file.type,
+        upsert: true,
+      })
 
-      if (!uploadError && data) {
-        // Get public URL for the uploaded file
-        const { data: urlData } = supabase.storage
-          .from(BUCKET_NAME)
-          .getPublicUrl(filePath)
-
-        if (!urlData?.publicUrl) {
-          throw new Error('Failed to generate public URL for uploaded image.')
-        }
-
-        return urlData.publicUrl
-      }
-
-      lastUploadError = uploadError ?? new Error('Upload returned no data.')
-
-      if (contentType === 'image/jpeg' && isUnsupportedMimeTypeError(lastUploadError)) {
-        continue
-      }
-
-      throw lastUploadError
+    if (uploadError) {
+      throw uploadError
     }
 
+    if (!data) {
+      throw new Error('Upload returned no data.')
+    }
+
+    // Get public URL for the uploaded file
+    const { data: urlData } = supabase.storage
+      .from(BUCKET_NAME)
+      .getPublicUrl(filePath)
+
+    if (!urlData?.publicUrl) {
+      throw new Error('Failed to generate public URL for uploaded image.')
+    }
+
+    return urlData.publicUrl
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     const friendlyMessage = getUserFriendlyMessage(error)
