@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 type SearchBarProps = {
@@ -14,11 +14,7 @@ type SearchBarProps = {
   compact?: boolean
 }
 
-/**
- * Inner component that mounts fresh when initialQuery changes (via key).
- * This avoids both useEffect-setState and ref-during-render lint issues.
- */
-function SearchBarInner({
+export function SearchBar({
   initialQuery = '',
   onSearch,
   placeholder = 'Search people, posts, fields, skills...',
@@ -28,6 +24,10 @@ function SearchBarInner({
   const [value, setValue] = useState(initialQuery)
   const navigate = useNavigate()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    setValue(initialQuery)
+  }, [initialQuery])
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,12 +106,4 @@ function SearchBarInner({
       </div>
     </form>
   )
-}
-
-/**
- * Wrapper that uses `key` to remount the inner component when initialQuery changes,
- * avoiding lint issues with useEffect/setState and ref access during render.
- */
-export function SearchBar(props: SearchBarProps) {
-  return <SearchBarInner key={props.initialQuery ?? ''} {...props} />
 }

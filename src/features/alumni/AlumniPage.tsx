@@ -80,7 +80,7 @@ export function AlumniPage() {
               page: 1,
             }))
           }
-          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 backdrop-blur transition focus:border-emerald-300/40 focus:outline-none cursor-pointer"
+          className="custom-select rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 backdrop-blur transition focus:border-emerald-300/40 focus:outline-none cursor-pointer"
         >
           <option value="">All Fields</option>
           {(fields ?? []).map((f) => (
@@ -101,7 +101,7 @@ export function AlumniPage() {
               page: 1,
             }))
           }
-          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 backdrop-blur transition focus:border-emerald-300/40 focus:outline-none cursor-pointer"
+          className="custom-select rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 backdrop-blur transition focus:border-emerald-300/40 focus:outline-none cursor-pointer"
         >
           <option value="">All Skills</option>
           {(skills ?? []).map((s) => (

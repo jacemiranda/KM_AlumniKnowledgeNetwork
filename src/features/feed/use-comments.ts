@@ -1,10 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../auth/use-auth'
-import { createComment, deleteComment, fetchComments } from './comment-service'
+import { createComment, deleteComment, fetchComments, fetchUserComments } from './comment-service'
 import { POST_KEYS } from './use-posts'
 
 export const COMMENT_KEYS = {
+  all: ['comments'] as const,
   list: (postId: string) => ['comments', postId] as const,
+  userList: (userId: string) => ['comments', 'user', userId] as const,
 }
 
 export function useComments(postId: string) {
@@ -12,6 +14,14 @@ export function useComments(postId: string) {
     queryKey: COMMENT_KEYS.list(postId),
     queryFn: () => fetchComments(postId),
     enabled: !!postId,
+  })
+}
+
+export function useUserComments(userId: string) {
+  return useQuery({
+    queryKey: COMMENT_KEYS.userList(userId),
+    queryFn: () => fetchUserComments(userId),
+    enabled: !!userId,
   })
 }
 
