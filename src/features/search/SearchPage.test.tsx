@@ -61,11 +61,10 @@ describe('SearchPage', () => {
   it('renders the search layout and toggles result filters', async () => {
     renderSearchPage()
 
-    expect(screen.getByRole('heading', { name: /search people, posts, and topics/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /^search$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Posts' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Alumni' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Tags' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'People' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /avery alumni/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /react study group/i })).toBeInTheDocument()
 

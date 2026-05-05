@@ -1,19 +1,61 @@
 import { useQuery } from '@tanstack/react-query'
-import { useState, type KeyboardEvent } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { getSupabaseClient } from '../../lib/supabase'
 import { useAuth } from '../auth/use-auth'
 import { type CreatePostFormValues } from './post-schemas'
 import { findOrCreateTags } from './tag-service'
-import { FeedSurface, PostTypeTabs } from './feed-ui'
 import { useCreatePost } from './use-posts'
 import { useTags } from './use-tags'
 
-export function PostComposer({ onSuccess }: { onSuccess?: () => void }) {
+type PostComposerProps = {
+  onSuccess?: () => void
+  initialTaggedAlumni?: { id: string; name: string } | null
+  initialPostType?: 'information' | 'question'
+}
+
+export function PostComposer({
+  onSuccess,
+  initialTaggedAlumni = null,
+  initialPostType = 'information',
+}: PostComposerProps) {
   const { session } = useAuth()
   const createPost = useCreatePost()
   const [tagInput, setTagInput] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+
+  // Alumni tagging state
+  const [alumniSearch, setAlumniSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [selectedAlumni, setSelectedAlumni] = useState<{ id: string; name: string } | null>(
+    initialTaggedAlumni,
+  )
+  const [showAlumniDropdown, setShowAlumniDropdown] = useState(false)
+
+  // Debounce alumni search
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(alumniSearch), 300)
+    return () => clearTimeout(timer)
+  }, [alumniSearch])
+
+  // Search alumni profiles
+  const { data: alumniResults } = useQuery({
+    queryKey: ['alumni-search', debouncedSearch],
+    queryFn: async () => {
+      if (!debouncedSearch || debouncedSearch.length < 2) return []
+      const supabase = getSupabaseClient()
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, name, profile_picture_url')
+        .eq('user_type', 'alumni')
+        .eq('status', 'active')
+        .ilike('name', `%${debouncedSearch}%`)
+        .limit(6)
+      if (error) return []
+      return data as Array<{ id: string; name: string; profile_picture_url: string | null }>
+    },
+    enabled: debouncedSearch.length >= 2,
+  })
 
   const { data: fieldOptions } = useQuery({
     queryKey: ['fields-list'],
@@ -43,13 +85,31 @@ export function PostComposer({ onSuccess }: { onSuccess?: () => void }) {
       title: '',
       content: '',
       fieldId: '',
-      postType: 'information',
+      postType: initialPostType,
       tagNames: [],
-      taggedAlumniId: null,
+      taggedAlumniId: initialTaggedAlumni?.id ?? null,
     },
   })
 
   const postType = useWatch({ control, name: 'postType' })
+
+  // Close dropdown on outside click
+  const handleDropdownBlur = useCallback(() => {
+    // Delay so click events on dropdown items fire first
+    setTimeout(() => setShowAlumniDropdown(false), 200)
+  }, [])
+
+  function selectAlumni(alumni: { id: string; name: string }) {
+    setSelectedAlumni(alumni)
+    setValue('taggedAlumniId', alumni.id)
+    setAlumniSearch('')
+    setShowAlumniDropdown(false)
+  }
+
+  function clearAlumni() {
+    setSelectedAlumni(null)
+    setValue('taggedAlumniId', null)
+  }
 
   function addTag(tag: string) {
     const trimmed = tag.trim()
@@ -62,12 +122,12 @@ export function PostComposer({ onSuccess }: { onSuccess?: () => void }) {
   }
 
   function removeTag(tag: string) {
-    const next = selectedTags.filter((item) => item !== tag)
+    const next = selectedTags.filter((t) => t !== tag)
     setSelectedTags(next)
     setValue('tagNames', next)
   }
 
-  function handleTagKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+  function handleTagKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault()
       addTag(tagInput)
@@ -76,6 +136,7 @@ export function PostComposer({ onSuccess }: { onSuccess?: () => void }) {
 
   async function onSubmit(data: CreatePostFormValues) {
     try {
+      // Resolve tag names to IDs
       const tagIds = await findOrCreateTags(data.tagNames)
 
       await createPost.mutateAsync({
@@ -90,65 +151,159 @@ export function PostComposer({ onSuccess }: { onSuccess?: () => void }) {
       reset()
       setSelectedTags([])
       setTagInput('')
+      setSelectedAlumni(null)
       onSuccess?.()
     } catch {
-      // Mutation state surfaces the error.
+      // Error is handled by mutation state
     }
   }
 
   if (!session) return null
 
   return (
-    <FeedSurface className="overflow-hidden p-4 sm:p-5">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Composer</p>
-            <h2 className="mt-1 text-lg font-black tracking-tight text-white">Share knowledge, ask for help</h2>
-          </div>
-          <PostTypeTabs value={postType} onChange={(next) => setValue('postType', next)} />
+    <section className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-liquid backdrop-blur-2xl sm:p-5">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Post Type Selector */}
+        <div className="mb-4 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setValue('postType', 'information')}
+            className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
+              postType === 'information'
+                ? 'border border-emerald-300/40 bg-emerald-300/15 text-emerald-100'
+                : 'border border-white/10 bg-white/5 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            Information
+          </button>
+          <button
+            type="button"
+            onClick={() => setValue('postType', 'question')}
+            className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
+              postType === 'question'
+                ? 'border border-amber-300/40 bg-amber-300/15 text-amber-100'
+                : 'border border-white/10 bg-white/5 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            Question
+          </button>
         </div>
 
-        <div>
+        {/* Title */}
+        <div className="mb-3">
           <input
             {...register('title')}
             type="text"
             placeholder={postType === 'question' ? 'What do you want to ask?' : 'Title of your post'}
-            className="w-full rounded-[22px] border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-300/30 focus:outline-none"
+            className="w-full rounded-2xl border border-white/10 bg-ink-900/60 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-300/30 focus:outline-none"
           />
-          {errors.title && <p className="mt-1 text-xs text-red-400">{errors.title.message}</p>}
+          {errors.title && (
+            <p className="mt-1 text-xs text-red-400">{errors.title.message}</p>
+          )}
         </div>
 
-        <div>
+        {/* Content */}
+        <div className="mb-3">
           <textarea
             {...register('content')}
-            rows={7}
+            rows={4}
             placeholder="Share a practical insight, ask a question, or tag an alumni expert..."
-            className="min-h-[180px] w-full resize-none rounded-[28px] border border-white/10 bg-black/20 px-4 py-4 text-sm text-white placeholder:text-slate-500 focus:border-emerald-300/30 focus:outline-none md:min-h-[220px]"
+            className="w-full resize-none rounded-2xl border border-white/10 bg-ink-900/60 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-300/30 focus:outline-none"
           />
-          {errors.content && <p className="mt-1 text-xs text-red-400">{errors.content.message}</p>}
+          {errors.content && (
+            <p className="mt-1 text-xs text-red-400">{errors.content.message}</p>
+          )}
         </div>
 
-        <div>
+        {/* Field & Alumni row */}
+        <div className="mb-3 grid gap-3 sm:grid-cols-2">
+          {/* Field Selector — single controlled select, no conflicting defaultValue */}
           <select
             {...register('fieldId')}
-            className="w-full rounded-[22px] border border-white/10 bg-black/20 px-4 py-3 text-sm text-white focus:border-emerald-300/30 focus:outline-none"
-            defaultValue=""
+            className="custom-select w-full rounded-2xl border border-white/10 bg-ink-900/60 px-4 py-3 text-sm text-white focus:border-emerald-300/30 focus:outline-none"
           >
-            <option value="" disabled>
-              Select a field...
-            </option>
+            <option value="">Select a field...</option>
             {(fieldOptions ?? []).map((field) => (
               <option key={field.id} value={field.id}>
                 {field.name}
               </option>
             ))}
           </select>
-          {errors.fieldId && <p className="mt-1 text-xs text-red-400">{errors.fieldId.message}</p>}
+
+          {/* Tag Alumni Selector */}
+          <div className="relative">
+            {selectedAlumni ? (
+              <div className="flex items-center gap-2 rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-3">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 text-cyan-300">
+                  <path d="M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z" />
+                </svg>
+                <span className="flex-1 truncate text-sm font-semibold text-cyan-100">
+                  {selectedAlumni.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={clearAlumni}
+                  className="text-cyan-300/60 transition hover:text-white"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                    <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                  </svg>
+                </button>
+              </div>
+            ) : (
+              <div className="relative">
+                <input
+                  type="text"
+                  value={alumniSearch}
+                  onChange={(e) => {
+                    setAlumniSearch(e.target.value)
+                    setShowAlumniDropdown(true)
+                  }}
+                  onFocus={() => alumniSearch.length >= 2 && setShowAlumniDropdown(true)}
+                  onBlur={handleDropdownBlur}
+                  placeholder="Tag an alumni expert..."
+                  className="w-full rounded-2xl border border-white/10 bg-ink-900/60 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-300/30 focus:outline-none"
+                />
+
+                {/* Dropdown results */}
+                {showAlumniDropdown && (alumniResults ?? []).length > 0 && (
+                  <div className="absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-2xl border border-white/10 bg-ink-900/95 shadow-xl backdrop-blur-2xl">
+                    {(alumniResults ?? []).map((alumni) => (
+                      <button
+                        key={alumni.id}
+                        type="button"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => selectAlumni(alumni)}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/5 cursor-pointer"
+                      >
+                        {alumni.profile_picture_url ? (
+                          <img
+                            src={alumni.profile_picture_url}
+                            alt={alumni.name}
+                            className="h-7 w-7 rounded-full object-cover ring-1 ring-white/10"
+                          />
+                        ) : (
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-400/20 text-[10px] font-bold text-cyan-200 ring-1 ring-white/10">
+                            {alumni.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)}
+                          </div>
+                        )}
+                        <span className="truncate text-sm text-slate-200">{alumni.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div>
-          <div className="flex flex-wrap items-center gap-2 rounded-[24px] border border-white/10 bg-black/20 px-4 py-3">
+        {errors.fieldId && (
+          <p className="-mt-2 mb-3 text-xs text-red-400">{errors.fieldId.message}</p>
+        )}
+
+        {/* Tag Input */}
+        <div className="mb-3">
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-ink-900/60 px-4 py-2">
             {selectedTags.map((tag) => (
               <span
                 key={tag}
@@ -175,34 +330,60 @@ export function PostComposer({ onSuccess }: { onSuccess?: () => void }) {
             />
             <datalist id="tag-suggestions">
               {(existingTags ?? [])
-                .filter((tag) => !selectedTags.includes(tag.name))
-                .map((tag) => (
-                  <option key={tag.id} value={tag.name} />
+                .filter((t) => !selectedTags.includes(t.name))
+                .map((t) => (
+                  <option key={t.id} value={t.name} />
                 ))}
             </datalist>
           </div>
-          {errors.tagNames && <p className="mt-1 text-xs text-red-400">{errors.tagNames.message}</p>}
+          
+          {/* Tag Suggestions List */}
+          {(existingTags ?? []).filter((t) => !selectedTags.includes(t.name)).length > 0 && (
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                Suggested:
+              </span>
+              {(existingTags ?? [])
+                .filter((t) => !selectedTags.includes(t.name))
+                // Optionally filter by tagInput if you want dynamic suggestions, but static is fine for discoverability
+                .filter((t) => !tagInput || t.name.toLowerCase().includes(tagInput.toLowerCase()))
+                .slice(0, 15)
+                .map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => addTag(t.name)}
+                    className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] text-slate-300 transition hover:border-emerald-300/30 hover:bg-emerald-300/10 hover:text-emerald-200 cursor-pointer"
+                  >
+                    + {t.name}
+                  </button>
+                ))}
+            </div>
+          )}
+
+          {errors.tagNames && (
+            <p className="mt-1 text-xs text-red-400">{errors.tagNames.message}</p>
+          )}
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
-          {createPost.error ? (
-            <p className="text-xs text-red-400 sm:max-w-[60%]">
+        {/* Actions */}
+        <div className="flex items-center justify-between border-t border-white/10 pt-3">
+          {createPost.error && (
+            <p className="text-xs text-red-400">
               {createPost.error instanceof Error ? createPost.error.message : 'Failed to create post.'}
             </p>
-          ) : (
-            <span className="text-xs text-slate-500">Posts appear immediately in the universal feed.</span>
           )}
           <div className="ml-auto">
             <button
               type="submit"
               disabled={isSubmitting || createPost.isPending}
-              className="rounded-full border border-[#ffb95f] border-t-[#ffb95f] bg-gradient-to-b from-emerald-300 via-emerald-500 to-emerald-950 px-5 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-emerald-50 shadow-[0_10px_24px_rgba(0,0,0,0.24)] transition hover:brightness-110 disabled:opacity-50"
+              className="rounded-full border border-emerald-300/40 bg-emerald-300/15 px-5 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-emerald-100 transition hover:bg-emerald-300/25 disabled:opacity-50"
             >
               {createPost.isPending ? 'Posting...' : 'Publish Post'}
             </button>
           </div>
         </div>
       </form>
-    </FeedSurface>
+    </section>
   )
 }
