@@ -114,6 +114,10 @@ All notable project changes should be recorded here.
 
 ## Sprint 3 - Final Release
 
+- Added M1 PR-03: PM Reflection and Presentation Revised.
+  - Created `docs/pm-reflection.md` with delivered vs. planned scope, key decisions, team coordination observations, SECI alignment assessment, and lessons learned.
+  - Created `docs/demo-flow.md` with six-segment oral defense walkthrough for Student, Alumni, Moderator/Admin, and KM/SECI segments with timing, steps, and talking points.
+  - Created `docs/prompt-logs/m1-prompt-log.md` with nine entries covering all M1 PRs across Sprint 1, Sprint 2, and Sprint 3.
 - Added M1 PR-02: Final Decision Log and Board Revised.
   - Added four Sprint 3 decisions to `docs/decision-log.md`: 16 Tier 1 badge scope, Vercel as deployment platform, MVP scope freeze at Week 5, and analytics restricted to platform-wide counts.
   - Created `docs/standups/week-05-standup.md` with Sprint 3 Week 1 member updates, scope freeze decision, and M5 QA blocker tracking.
