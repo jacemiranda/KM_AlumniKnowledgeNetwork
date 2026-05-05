@@ -182,12 +182,12 @@ export function AppShell() {
                 <div
                   onMouseEnter={() => setIsFloatingVisible(true)}
                   onMouseLeave={() => setIsFloatingVisible(false)}
-                  className={`pointer-events-auto fixed top-4 z-50 transform transition-transform duration-300 ease-out ${
+                  className={`pointer-events-auto fixed top-6 z-50 transform transition-transform duration-300 ease-out ${
                     isFloatingVisible ? 'translate-y-0' : '-translate-y-[150%]'
                   }`}
                   style={{ left: `${floatingStyle.left}px`, width: `${floatingStyle.width}px` }}
                 >
-                  <div className="rounded-3xl border border-white/10 bg-[#131b2e]/80 backdrop-blur-2xl shadow-lg p-4 sm:p-5">
+                  <div className="rounded-3xl border border-white/10 bg-[#131b2e]/80 backdrop-blur-2xl shadow-2xl p-4 sm:p-5">
                     {renderTopBarContent()}
                   </div>
                 </div>
@@ -196,13 +196,39 @@ export function AppShell() {
               {/* Edge blur overlays to focus center posts while scrolling */}
               {showEdgeBlur && mainStyle && (
                 <>
+                  {/* Top blur with horizontal fade */}
                   <div
-                    className="fixed top-0 h-12 pointer-events-none z-40 backdrop-blur-sm bg-gradient-to-b from-[#131b2e]/30 to-transparent"
-                    style={{ left: `${mainStyle.left}px`, width: `${mainStyle.width}px` }}
+                    className="fixed top-0 h-20 pointer-events-none z-40 backdrop-blur-sm"
+                    style={{
+                      left: `${mainStyle.left}px`,
+                      width: `${mainStyle.width}px`,
+                      background: 'linear-gradient(to bottom, rgba(19,27,46,0.3) 0%, rgba(19,27,46,0.15) 50%, rgba(19,27,46,0) 100%), linear-gradient(to right, rgba(19,27,46,0.2) 0%, transparent 20%, transparent 80%, rgba(19,27,46,0.2) 100%)'
+                    }}
                   />
+                  {/* Bottom blur with horizontal fade */}
                   <div
-                    className="fixed bottom-0 h-12 pointer-events-none z-40 backdrop-blur-sm bg-gradient-to-t from-[#131b2e]/30 to-transparent"
-                    style={{ left: `${mainStyle.left}px`, width: `${mainStyle.width}px` }}
+                    className="fixed bottom-0 h-20 pointer-events-none z-40 backdrop-blur-sm"
+                    style={{
+                      left: `${mainStyle.left}px`,
+                      width: `${mainStyle.width}px`,
+                      background: 'linear-gradient(to top, rgba(19,27,46,0.3) 0%, rgba(19,27,46,0.15) 50%, rgba(19,27,46,0) 100%), linear-gradient(to right, rgba(19,27,46,0.2) 0%, transparent 20%, transparent 80%, rgba(19,27,46,0.2) 100%)'
+                    }}
+                  />
+                  {/* Left edge fade */}
+                  <div
+                    className="fixed top-0 bottom-0 w-12 pointer-events-none z-40"
+                    style={{
+                      left: `${mainStyle.left}px`,
+                      background: 'linear-gradient(to right, rgba(19,27,46,0.15) 0%, transparent 100%)'
+                    }}
+                  />
+                  {/* Right edge fade */}
+                  <div
+                    className="fixed top-0 bottom-0 w-12 pointer-events-none z-40"
+                    style={{
+                      right: `calc(100vw - ${mainStyle.left + mainStyle.width}px)`,
+                      background: 'linear-gradient(to left, rgba(19,27,46,0.15) 0%, transparent 100%)'
+                    }}
                   />
                 </>
               )}
