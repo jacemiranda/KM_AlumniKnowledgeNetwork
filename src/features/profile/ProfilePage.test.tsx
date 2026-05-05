@@ -1,14 +1,15 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ProfilePage } from './ProfilePage'
 
 const mockUseAuth = vi.fn()
 const mockUseProfileMetrics = vi.fn()
-const mockUseCastVote = vi.fn()
-const mockUseRemoveVote = vi.fn()
 const mockUseUserBadges = vi.fn()
 const mockUseCheckBadges = vi.fn()
+const mockUsePosts = vi.fn()
+const mockUseUserComments = vi.fn()
 
 vi.mock('../auth/use-auth', () => ({
   useAuth: () => mockUseAuth(),
@@ -18,14 +19,17 @@ vi.mock('./use-profile-metrics', () => ({
   useProfileMetrics: (profileId: string) => mockUseProfileMetrics(profileId),
 }))
 
-vi.mock('../feed/use-votes', () => ({
-  useCastVote: () => mockUseCastVote(),
-  useRemoveVote: () => mockUseRemoveVote(),
-}))
-
 vi.mock('../badges/use-badges', () => ({
   useUserBadges: () => mockUseUserBadges(),
   useCheckBadges: () => mockUseCheckBadges(),
+}))
+
+vi.mock('../feed/use-posts', () => ({
+  usePosts: () => mockUsePosts(),
+}))
+
+vi.mock('../feed/use-comments', () => ({
+  useUserComments: () => mockUseUserComments(),
 }))
 
 function profile(overrides = {}) {
@@ -49,13 +53,18 @@ function profile(overrides = {}) {
 }
 
 function renderProfile(path: string) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  })
   render(
-    <MemoryRouter initialEntries={[path]}>
-      <Routes>
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/profile/:userId" element={<ProfilePage />} />
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={[path]}>
+        <Routes>
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/:userId" element={<ProfilePage />} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   )
 }
 
@@ -78,8 +87,8 @@ describe('ProfilePage', () => {
       isLoading: false,
       error: null,
     })
-    mockUseCastVote.mockReturnValue({ mutate: vi.fn(), isPending: false })
-    mockUseRemoveVote.mockReturnValue({ mutate: vi.fn(), isPending: false })
+    mockUsePosts.mockReturnValue({ data: { posts: [] }, isLoading: false })
+    mockUseUserComments.mockReturnValue({ data: [], isLoading: false })
     mockUseUserBadges.mockReturnValue({ data: [], isLoading: false })
     mockUseCheckBadges.mockReturnValue({ mutate: vi.fn() })
   })
@@ -99,23 +108,11 @@ describe('ProfilePage', () => {
     expect(mockUseProfileMetrics).toHaveBeenCalledWith('profile-99')
   })
 
-  it('hides vote controls on the viewer own profile', () => {
-    mockUseAuth.mockReturnValue({
-      session: {
-        user: {
-          id: 'profile-1',
-          name: 'Avery Alumni',
-          email: 'alumni@example.com',
-          role: 'end_user',
-          userType: 'alumni',
-          profileCompleted: true,
-        },
-      },
-    })
-
+  it('renders the content tabs', () => {
     renderProfile('/profile')
 
-    expect(screen.queryByRole('button', { name: /upvote/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /downvote/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /posts/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /comments/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /tagged/i })).toBeInTheDocument()
   })
 })

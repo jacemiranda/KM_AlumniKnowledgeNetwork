@@ -1,5 +1,3 @@
-> **Canonical template:** `.github/pull_request_template.md` is the source of truth. GitHub uses it automatically when opening a PR. This file is a readable reference only.
-
 ## Branch: '[branch-name]'
 
 ## What Changed?
