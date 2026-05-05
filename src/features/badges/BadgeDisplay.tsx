@@ -101,6 +101,8 @@ function BadgeChip({ badge, compact }: BadgeChipProps) {
   if (compact) {
     return (
       <span
+        role="status"
+        aria-label={`${badge.badge.name} badge`}
         title={`${badge.badge.name}: ${badge.badge.description ?? ''}`}
         className={`inline-flex items-center gap-1 rounded-full border ${styles.border} ${styles.bg} px-2 py-0.5 ${styles.text}`}
       >
@@ -112,8 +114,10 @@ function BadgeChip({ badge, compact }: BadgeChipProps) {
 
   return (
     <div
+      role="status"
+      aria-label={`${badge.badge.name} badge`}
       title={badge.badge.description ?? ''}
-      className={`inline-flex items-center gap-2 rounded-xl border ${styles.border} ${styles.bg} px-3 py-2 transition-colors cursor-default`}
+      className={`inline-flex items-center gap-2 rounded-xl border ${styles.border} ${styles.bg} px-3 py-2 transition-colors cursor-default hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-[#4edea3] transition-all duration-300`}
     >
       <BadgeIcon iconName={badge.badge.icon_name} className={`h-4 w-4 ${styles.text}`} />
       <div className="min-w-0">

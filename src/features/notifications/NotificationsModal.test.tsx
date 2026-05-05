@@ -86,7 +86,7 @@ describe('NotificationsModal', () => {
 
       // Get the first unread notification by finding the title text
       const titleElement = screen.getByText('Your answer received an upvote');
-      const unreadNotification = titleElement.closest('div[class*="border-l-2"]');
+      const unreadNotification = titleElement.closest('button');
       expect(unreadNotification).toBeTruthy();
     
     // Check for emerald indicator - look for animate-pulse (which indicates the dot)
@@ -104,7 +104,7 @@ describe('NotificationsModal', () => {
 
       // Get a read notification by finding the title text
       const titleElement = screen.getByText('You have a new follower');
-      const readNotification = titleElement.closest('div[class*="border-l-2"]');
+      const readNotification = titleElement.closest('button');
       expect(readNotification).toBeTruthy();
     
     // Read notifications should not have primary border or brighter styling
@@ -137,8 +137,8 @@ describe('NotificationsModal', () => {
       />
     );
 
-    const firstNotification = screen.getByText('Your answer received an upvote');
-    fireEvent.click(firstNotification.closest('div[class*="cursor-pointer"]')!);
+    const firstNotification = screen.getByRole('button', { name: /Your answer received an upvote/i });
+    fireEvent.click(firstNotification);
 
     expect(handleClick).toHaveBeenCalledWith('1');
   });
@@ -173,7 +173,7 @@ describe('NotificationsModal', () => {
       />
     );
 
-    const viewAllLink = screen.getByText(/View all notifications/);
+    const viewAllLink = screen.getByRole('button', { name: /View all notifications/i });
     expect(viewAllLink).toBeInTheDocument();
   });
 });

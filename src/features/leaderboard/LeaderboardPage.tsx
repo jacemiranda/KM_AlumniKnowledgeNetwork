@@ -64,7 +64,8 @@ function PodiumCard({
   return (
     <Link
       to={`/profile/${entry.id}`}
-      className={`group relative flex cursor-pointer flex-col items-center rounded-3xl border border-white/10 ${style.bg} p-6 text-center shadow-liquid backdrop-blur-2xl transition-all hover:border-white/20 hover:shadow-2xl`}
+      aria-label={`View profile of ${entry.name}`}
+      className={`group relative flex cursor-pointer flex-col items-center rounded-3xl border border-white/10 ${style.bg} p-6 text-center shadow-liquid backdrop-blur-2xl transition-all duration-300 hover:border-white/20 hover:bg-white/5 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[#4edea3]`}
     >
       <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-2xl">{style.medal}</span>
 
@@ -142,7 +143,7 @@ export function LeaderboardPage() {
   const tableEntries = page === 1 ? entries.slice(3) : entries
 
   return (
-    <div className="mx-auto max-w-5xl space-y-5">
+    <main className="mx-auto max-w-5xl space-y-5">
       {/* Admin/Moderator analytics */}
       <AnalyticsSummary />
 
@@ -153,8 +154,8 @@ export function LeaderboardPage() {
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-200">
               Rankings
             </p>
-            <h2 className="mt-2 text-3xl font-black tracking-tight text-white">Leaderboard</h2>
-            <p className="mt-1 text-sm text-slate-400">
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-[#dae2fd]">Leaderboard</h2>
+            <p className="mt-1 text-sm text-[#bbcabf]">
               Top contributors ranked by authority score and participation.
             </p>
           </div>
@@ -163,12 +164,14 @@ export function LeaderboardPage() {
           <div className="flex-shrink-0">
             <select
               id="leaderboard-field-filter"
+              aria-label="Filter leaderboard by field"
+              aria-expanded="false"
               value={fieldId}
               onChange={(e) => {
                 setFieldId(e.target.value)
                 setPage(1)
               }}
-              className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-200 backdrop-blur transition hover:border-white/20 focus:border-emerald-300/40 focus:outline-none"
+              className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-[#dae2fd] backdrop-blur transition-all duration-300 hover:border-white/20 hover:bg-white/10 focus:border-[#4edea3] focus:outline-none focus:ring-2 focus:ring-[#4edea3]"
             >
               <option value="">All Fields</option>
               {(fields ?? []).map((f: { id: string; name: string }) => (
@@ -243,7 +246,8 @@ export function LeaderboardPage() {
                     <td className="px-4 py-3">
                       <Link
                         to={`/profile/${entry.id}`}
-                        className="flex items-center gap-3 cursor-pointer"
+                        aria-label={`View profile of ${entry.name}`}
+                        className="flex items-center gap-3 cursor-pointer rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4edea3] p-1 -m-1 transition-all duration-300"
                       >
                         {entry.profile_picture_url ? (
                           <img
@@ -294,9 +298,10 @@ export function LeaderboardPage() {
         <div className="flex items-center justify-center gap-3">
           <button
             type="button"
+            aria-label="Previous Page"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+            className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-[#dae2fd] transition-all duration-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#4edea3] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Previous
           </button>
@@ -305,14 +310,15 @@ export function LeaderboardPage() {
           </span>
           <button
             type="button"
+            aria-label="Next Page"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+            className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-[#dae2fd] transition-all duration-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#4edea3] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Next
           </button>
         </div>
       )}
-    </div>
+    </main>
   )
 }
