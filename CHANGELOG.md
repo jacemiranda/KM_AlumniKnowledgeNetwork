@@ -4,6 +4,9 @@ All notable project changes should be recorded here.
 
 ## Unreleased
 
+- Added M5 Sprint 3 PR-03: Failure Analysis Report Revised.
+  - Created `docs/failure-analysis-report.md` analyzing scope creep, authentication complexity, navigation UX, and database design lessons.
+
 - Added M5 Sprint 3 PR-02: README and Wiki Final Revised.
   - Finalized `README.md` to include links to the user guide and wiki structure.
   - Revised `docs/wiki/structure.md` to reflect the final Sprint 3 features (Leaderboard, Moderation, Badges).
