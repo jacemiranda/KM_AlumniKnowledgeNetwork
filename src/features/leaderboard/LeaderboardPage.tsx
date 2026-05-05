@@ -121,12 +121,14 @@ function PodiumCard({
 export function LeaderboardPage() {
   const { session } = useAuth()
   const [fieldId, setFieldId] = useState<string>('')
+  const [userType, setUserType] = useState<'alumni' | 'student' | ''>('')
   const [page, setPage] = useState(1)
   const limit = 20
 
   const { data: fields } = useFields()
   const { data, isLoading, error } = useLeaderboard({
     fieldId: fieldId || undefined,
+    userType,
     page,
     limit,
   })
@@ -159,8 +161,22 @@ export function LeaderboardPage() {
             </p>
           </div>
 
-          {/* Field filter */}
-          <div className="flex-shrink-0">
+          {/* Filters */}
+          <div className="flex flex-shrink-0 gap-3">
+            <select
+              id="leaderboard-usertype-filter"
+              value={userType}
+              onChange={(e) => {
+                setUserType(e.target.value as 'alumni' | 'student' | '')
+                setPage(1)
+              }}
+              className="custom-select cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-200 backdrop-blur transition hover:border-white/20 focus:border-emerald-300/40 focus:outline-none"
+            >
+              <option value="">All Users</option>
+              <option value="alumni">Alumni</option>
+              <option value="student">Students</option>
+            </select>
+
             <select
               id="leaderboard-field-filter"
               value={fieldId}
@@ -168,7 +184,7 @@ export function LeaderboardPage() {
                 setFieldId(e.target.value)
                 setPage(1)
               }}
-              className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-200 backdrop-blur transition hover:border-white/20 focus:border-emerald-300/40 focus:outline-none"
+              className="custom-select cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-200 backdrop-blur transition hover:border-white/20 focus:border-emerald-300/40 focus:outline-none"
             >
               <option value="">All Fields</option>
               {(fields ?? []).map((f: { id: string; name: string }) => (

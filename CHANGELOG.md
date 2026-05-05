@@ -4,6 +4,29 @@ All notable project changes should be recorded here.
 
 ## Unreleased
 
+- Added M5 Sprint 3 PR-04: QA Reflection and Signoff Revised.
+  - Created `docs/qa-reflection.md` with comprehensive QA reflection covering Sprint 3 testing scope (9 pages, 4 role flows), quality checks, key findings (strengths, observations, no critical blockers), process improvements, and lessons learned across the 6-week MVP cycle.
+  - Created `docs/final-qa-signoff.md` with formal QA sign-off document verifying all acceptance criteria met, role-based access working, core features functional, technical requirements satisfied, and deployment readiness confirmed.
+  - Updated M5 prompt log with Entries 10-11 documenting AI-assisted creation of QA reflection and final sign-off documents, including output synthesis, cross-verification with test evidence, and manual formatting adjustments.
+
+- Added M5 Sprint 3 PR-03: Failure Analysis Report Revised.
+  - Created `docs/failure-analysis-report.md` analyzing scope creep, authentication complexity, navigation UX, and database design lessons.
+
+- Added M5 Sprint 3 PR-02: README and Wiki Final Revised.
+  - Finalized `README.md` to include links to the user guide and wiki structure.
+  - Revised `docs/wiki/structure.md` to reflect the final Sprint 3 features (Leaderboard, Moderation, Badges).
+  - Created `docs/wiki/user-guide.md` providing comprehensive instructions for Student, Alumni, Moderator, and Admin roles.
+  - Removed outdated messaging and community-approval assumptions from final documentation.
+
+- Added M5 Sprint 1 PR-02: README Contributing Revised.
+  - Revised `README.md` with setup guide (prerequisites, clone, env vars, database migrations, dev server), available scripts table, project structure tree, and organized documentation references.
+  - Revised `CONTRIBUTING.md` with pre-reading checklist, branch prefix table, database/migration rules, reviewer checklist, AI agent usage guide, and pre-PR verification steps.
+  - Created M5 prompt log entry for this PR.
+
+- Added M5 Sprint 3 PR-01: Final E2E Page Map Revised.
+  - Created `docs/test-cases/sprint3-final-e2e-page-map.md` validating the final page map, role-based flows, and acceptance criteria.
+  - Updated M5 QA prompt log with Sprint 3 E2E test generation prompt.
+
 - Added Sprint 3 PR-03: Deploy and Hardening Revised.
   - Added Vercel deployment config with Vite build settings and SPA route rewrites.
   - Added `npm run verify:deploy` for lint, tests, and production build verification.
@@ -38,6 +61,9 @@ All notable project changes should be recorded here.
 - Added the Sprint 1 PR-02 Supabase schema foundation for profiles, fields, skills, feed posts, and tags with RLS policies and seed taxonomy.
 - Added the Sprint 1 PR-03 Supabase Google OAuth session flow and first-time profile setup persistence.
 - Added Sprint 1 PR-04 documentation artifacts: initial ADR set for implemented decisions and the expanded M2 developer prompt log.
+- Added M5 Sprint 1 PR-03: QA Sprint 1 Log Revised.
+  - Added M5 QA & Documentation Lead prompt log.
+  - Added Sprint 1 documentation checklist tracking all member deliverables.
 - Added Sprint 2 PR-01: Posts, comments, tags, voting, and post-type flow.
   - Database migration 002: `comments` and `votes` tables with RLS policies, indexes, and triggers.
   - Service layer: `post-service`, `comment-service`, `vote-service`, `tag-service` with Supabase CRUD.
@@ -61,12 +87,28 @@ All notable project changes should be recorded here.
   - Added vote-state display, vote changing, and vote removal for profile and post-author voting flows.
   - Added focused tests for authority score computation, profile metrics loading, and profile route behavior.
 - Added Sprint 2 PR-04 architecture documentation for search, voting, authority score, and profile metrics decisions.
+- Added M5 Sprint 2 PR-01: Sprint 2 Feed Search Voting Cases.
+  - Created 10 QA test cases in `docs/test-cases/sprint2-feed-search-voting-cases.md` covering feed posting, comments, search filters, voting, and profile metrics.
+  - Updated M5 QA prompt log with Sprint 2 test case generation prompt.
+- Added M5 Sprint 2 PR-02: GitHub Issues QA Log Revised.
+  - Created `docs/test-cases/sprint2-github-issues-qa-log.md` with simulated bug reports, reproduction notes, and retest comments for Sprint 2.
+  - Updated M5 QA prompt log with Sprint 2 QA issue log generation prompt.
+- Added M5 Sprint 2 PR-03: Wiki and QA Update Sprint 2.
+  - Created `docs/wiki/structure.md` outlining the proposed GitHub Wiki structure.
+  - Created `docs/test-cases/sprint2-qa-report.md` summarizing the Sprint 2 test execution and sign-off.
+  - Updated M5 QA prompt log with Sprint 2 wiki and QA report generation.
 
 ## Sprint 1 - Foundation
 
 - OAuth authentication, first-time profile setup, field and skill taxonomy, feed foundation, and SECI setup.
 
 ## Sprint 2 - Core Interaction
+
+- Added M1 PR-03: Sprint 2 Board Audit Revised.
+  - Created `docs/sprint-tracking/sprint2-board.md` with Sprint 2 PR status table, gate criteria status, integration checkpoint, review readiness, open items, and confirmed demo path.
+- Added M1 PR-01: Standups Sprint 2 Revised.
+  - Created `docs/standups/week-03-standup.md` with Sprint 2 Week 1 member updates, blocker tracking, decisions, and next actions.
+  - Created `docs/standups/week-04-standup.md` with Sprint 2 Week 2 integration checkpoint, gate confirmation, and close-out coordination.
 
 - Posts, comments, search, alumni discovery, voting, authority score, and notifications modal.
 
@@ -76,5 +118,12 @@ All notable project changes should be recorded here.
   - Created `docs/pm-reflection.md` with delivered vs. planned scope, key decisions, team coordination observations, SECI alignment assessment, and lessons learned.
   - Created `docs/demo-flow.md` with six-segment oral defense walkthrough for Student, Alumni, Moderator/Admin, and KM/SECI segments with timing, steps, and talking points.
   - Created `docs/prompt-logs/m1-prompt-log.md` with nine entries covering all M1 PRs across Sprint 1, Sprint 2, and Sprint 3.
+- Added M1 PR-02: Final Decision Log and Board Revised.
+  - Added four Sprint 3 decisions to `docs/decision-log.md`: 16 Tier 1 badge scope, Vercel as deployment platform, MVP scope freeze at Week 5, and analytics restricted to platform-wide counts.
+  - Created `docs/standups/week-05-standup.md` with Sprint 3 Week 1 member updates, scope freeze decision, and M5 QA blocker tracking.
+  - Created `docs/standups/week-06-standup.md` with Sprint 3 Week 2 final gate status, remaining blockers, and sign-off coordination notes.
+  - Created `docs/sprint-tracking/sprint3-board.md` with Sprint 3 PR status table, gate criteria, board column mapping, and milestone closure blockers.
+- Added M1 PR-01: Final Release Coordination Revised.
+  - Created `docs/sprint-tracking/release-checklist.md` with nine-page page-map acceptance table, deployment readiness checks, role-based demo paths for Student, Alumni, Moderator, and Admin, quality checks against acceptance criteria, and Sprint 3 open item register.
 
 - Leaderboard, badges, moderation, user management, analytics, deployment, QA, and final documentation.

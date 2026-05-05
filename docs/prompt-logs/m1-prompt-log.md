@@ -8,6 +8,7 @@ Role: Project Manager / Scrum Master
 ## Sprint 1 — Foundation
 
 ### Entry 1
+## Entry 1
 
 Date: 2026-04-21
 Sprint: Sprint 1 - Foundation
@@ -44,11 +45,24 @@ Reflection:
 
 - What helped? Reading AGENTS.md and ROLE_PR_MAP.md before acting kept scope correct.
 - What did you verify? PR title format, branch name, target branch, template usage, and that no code files were changed.
+- Updated docs/PR-TEMPLATE.md to point to .github/pull_request_template.md as canonical.
+- Added M1 PR-01 CHANGELOG entry under Sprint 1 Foundation.
+
+Changes Made After Review:
+
+- Verified no source code files were included — PR scoped to documentation and governance only.
+- Confirmed branch name, PR title, and target branch match ROLE_PR_MAP.md.
+
+Reflection:
+
+- What helped? The agent read AGENTS.md, ROLE_PR_MAP.md, and SPRINT_DELIVERABLES.md before acting, which kept the scope correct.
+- What did you verify? PR title format, branch name, target branch, and template usage.
 - What did you change manually? Nothing — output matched deliverable requirements.
 
 ---
 
 ### Entry 2
+## Entry 2
 
 Date: 2026-04-22
 Sprint: Sprint 1 - Foundation
@@ -73,6 +87,9 @@ Output Used:
 
 - Completed docs/decision-log.md with five approved Sprint 1 decisions: SECI retention, comments-based interaction, OAuth-only auth, feed-first UX, and simplified MVP scope.
 - Created docs/standups/week-01-standup.md with member updates for M1–M5, confirmed decisions, risks, and next actions.
+- Completed docs/decision-log.md with five approved decisions: SECI retention, comments-based interaction, OAuth-only auth, feed-first UX, and simplified MVP scope.
+- Created docs/standups/week-01-standup.md with member updates (M1–M5), confirmed decisions, risks, and next actions.
+- Added M1 PR-02 CHANGELOG entry.
 
 Changes Made After Review:
 
@@ -83,11 +100,19 @@ Reflection:
 
 - What helped? The agent read the existing decision-log.md to identify incomplete entries, then added the Sprint 1 decisions called out in SPRINT_DELIVERABLES.md.
 - What did you verify? Decision completeness and standup coverage.
+- Confirmed standup template followed and all member sections populated.
+- Confirmed no code files changed.
+
+Reflection:
+
+- What helped? The agent read the existing decision-log.md to identify which entries were incomplete, then added the Sprint 1 decisions called out in SPRINT_DELIVERABLES.md.
+- What did you verify? Decision completeness and standup coverage for all five members.
 - What did you change manually? Nothing — output matched deliverable requirements.
 
 ---
 
 ### Entry 3
+## Entry 3
 
 Date: 2026-04-23
 Sprint: Sprint 1 - Foundation
@@ -118,6 +143,14 @@ Output Used:
 Changes Made After Review:
 
 - Verified GitHub PR numbers match the actual API response — board evidence is factual, not estimated.
+- Created docs/sprint-tracking/sprint1-board.md with Sprint 1 PR status table, gate status, and board column mapping.
+- Created docs/prompt-logs/m1-prompt-log.md (this file) covering all three Sprint 1 M1 planning entries.
+- Added M1 PR-03 CHANGELOG entry.
+
+Changes Made After Review:
+
+- Verified sprint board evidence table matches actual GitHub PR numbers pulled from the API.
+- Confirmed gate criteria status is accurate against merged PR list.
 - Confirmed prompt log format matches docs/prompt-logs/README.md template.
 
 Reflection:
@@ -365,4 +398,7 @@ Reflection:
 
 - What helped? The prior sprint board documents and decision log provided a complete factual record to draw from, making the reflection and demo flow grounded in what was actually delivered rather than what was planned.
 - What did you verify? SECI alignment table against M4 documentation, demo path against release checklist, and prompt log entry completeness.
+- What did you change manually? Nothing — output matched deliverable requirements.
+- What helped? Pulling live PR and milestone data from GitHub via the API kept the board evidence factual rather than estimated.
+- What did you verify? GitHub PR numbers, merge status, milestone creation, and M5 pending PR status.
 - What did you change manually? Nothing — output matched deliverable requirements.

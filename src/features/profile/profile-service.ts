@@ -1,10 +1,4 @@
 import { getSupabaseClient } from '../../lib/supabase'
-import type { VoteValue } from '../feed/vote-service'
-
-export type ProfileVoteRow = {
-  target_id: string
-  value: number
-}
 
 export type ProfileMetrics = {
   id: string
@@ -20,20 +14,16 @@ export type ProfileMetrics = {
   post_count: number
   posts_tagged_in: number
   comment_count: number
-  my_vote: VoteValue | null
+  my_vote: null
 }
 
 type QueryError = {
   message: string
 }
 
-export function computeAuthorityScore(votes: ProfileVoteRow[]): number {
-  return votes.reduce((score, vote) => score + vote.value, 0)
-}
-
 export async function fetchProfileMetrics(
   profileId: string,
-  viewerId?: string | null,
+  _viewerId?: string | null,
 ): Promise<ProfileMetrics> {
   const supabase = getSupabaseClient()
 
@@ -61,55 +51,49 @@ export async function fetchProfileMetrics(
     throw new Error('Profile not found.')
   }
 
-  const [votes, postCount, taggedCount, commentCount, myVote] = await Promise.all([
-    fetchVotesForProfile(profileId),
+  const [authorityScore, postCount, taggedCount, commentCount] = await Promise.all([
+    fetchAuthorityScore(profileId),
     countRows('posts', 'author_id', profileId),
     countRows('posts', 'tagged_alumni_id', profileId),
     countRows('comments', 'author_id', profileId),
-    viewerId && viewerId !== profileId ? fetchViewerVote(viewerId, profileId) : Promise.resolve(null),
   ])
 
   return {
     ...normalizeProfile(data),
-    authority_score: computeAuthorityScore(votes),
+    authority_score: authorityScore,
     post_count: postCount,
     posts_tagged_in: taggedCount,
     comment_count: commentCount,
-    my_vote: myVote,
+    my_vote: null,
   }
 }
 
-async function fetchVotesForProfile(profileId: string): Promise<ProfileVoteRow[]> {
+async function fetchAuthorityScore(profileId: string): Promise<number> {
   const supabase = getSupabaseClient()
-  const { data, error } = await supabase
-    .from('votes')
-    .select('target_id, value')
-    .eq('target_id', profileId) as { data: ProfileVoteRow[] | null; error: QueryError | null }
+  
+  // Sum votes from post_votes where the post's author is the profile
+  const { data: postVotes } = await supabase
+    .from('post_votes')
+    .select('value, post:posts(author_id)')
+    .eq('post.author_id', profileId) as { data: Array<{ value: number; post: { author_id: string } | null }> | null }
 
-  if (error) {
-    throw new Error(error.message)
+  let postVotesSum = 0
+  for (const v of postVotes ?? []) {
+    if (v.post) postVotesSum += v.value
   }
 
-  return data ?? []
-}
+  // Sum votes from comment_votes where the comment's author is the profile
+  const { data: commentVotes } = await supabase
+    .from('comment_votes')
+    .select('value, comment:comments(author_id)')
+    .eq('comment.author_id', profileId) as { data: Array<{ value: number; comment: { author_id: string } | null }> | null }
 
-async function fetchViewerVote(
-  viewerId: string,
-  profileId: string,
-): Promise<VoteValue | null> {
-  const supabase = getSupabaseClient()
-  const { data, error } = await supabase
-    .from('votes')
-    .select('value')
-    .eq('voter_id', viewerId)
-    .eq('target_id', profileId)
-    .maybeSingle() as { data: { value: VoteValue } | null; error: QueryError | null }
-
-  if (error) {
-    throw new Error(error.message)
+  let commentVotesSum = 0
+  for (const v of commentVotes ?? []) {
+    if (v.comment) commentVotesSum += v.value
   }
 
-  return data?.value ?? null
+  return postVotesSum + commentVotesSum
 }
 
 async function countRows(
