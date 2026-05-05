@@ -21,19 +21,17 @@ export function AppShell() {
   const [isFloatingVisible, setIsFloatingVisible] = useState(false)
   const [floatingStyle, setFloatingStyle] = useState<{ left: number; width: number } | null>(null)
   const [mainStyle, setMainStyle] = useState<{ left: number; width: number } | null>(null)
+  const [prevPathname, setPrevPathname] = useState(location.pathname)
 
-  useEffect(() => {
+  if (location.pathname !== prevPathname) {
+    setPrevPathname(location.pathname)
     setIsMobileMenuOpen(false)
-  }, [location.pathname])
+  }
 
-  const role = session?.user.role
+  const role = session?.user?.role
   const shellLinks = role === 'admin' || role === 'moderator'
     ? [...baseLinks, { to: '/admin', label: 'Admin' }]
     : baseLinks
-
-  if (!session) {
-    return null
-  }
 
   useEffect(() => {
     function updateScrollState() {
@@ -73,6 +71,10 @@ export function AppShell() {
     }
   }, [])
 
+  if (!session) {
+    return null
+  }
+
   function renderTopBarContent() {
     return (
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -84,19 +86,19 @@ export function AppShell() {
           {profile?.profilePictureUrl ? (
             <img
               src={profile.profilePictureUrl}
-              alt={session.user.name}
+              alt={session?.user.name}
               className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10 transition hover:ring-emerald-300/50"
             />
           ) : (
             <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 ring-2 ring-white/10 transition hover:ring-emerald-300/50">
-              <span className="text-xl font-bold uppercase">{session.user.name.charAt(0)}</span>
+              <span className="text-xl font-bold uppercase">{session?.user.name.charAt(0)}</span>
             </div>
           )}
           <div className="text-left">
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{session.user.userType ?? 'pending'}</p>
-            <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{session?.user.userType ?? 'pending'}</p>
+            <p className="mt-1 text-xl font-black tracking-tight text-white">{session?.user.name}</p>
             <p className="text-sm text-slate-300">
-              {session.user.email}
+              {session?.user.email}
             </p>
           </div>
         </button>
@@ -119,19 +121,19 @@ export function AppShell() {
           {profile?.profilePictureUrl ? (
             <img
               src={profile.profilePictureUrl}
-              alt={session.user.name}
+              alt={session?.user.name}
               className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10 transition hover:ring-emerald-300/50"
             />
           ) : (
             <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 ring-2 ring-white/10 transition hover:ring-emerald-300/50">
-              <span className="text-xl font-bold uppercase">{session.user.name.charAt(0)}</span>
+              <span className="text-xl font-bold uppercase">{session?.user.name.charAt(0)}</span>
             </div>
           )}
           <div className="text-left">
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{session.user.userType ?? 'pending'}</p>
-            <p className="mt-1 text-xl font-black tracking-tight text-white">{session.user.name}</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{session?.user.userType ?? 'pending'}</p>
+            <p className="mt-1 text-xl font-black tracking-tight text-white">{session?.user.name}</p>
             <p className="text-sm text-slate-300">
-              {session.user.email}
+              {session?.user.email}
             </p>
           </div>
         </button>

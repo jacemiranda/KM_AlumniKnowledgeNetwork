@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 type SearchBarProps = {
@@ -22,12 +22,14 @@ export function SearchBar({
   compact = false,
 }: SearchBarProps) {
   const [value, setValue] = useState(initialQuery)
+  const [prevInitialQuery, setPrevInitialQuery] = useState(initialQuery)
   const navigate = useNavigate()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  useEffect(() => {
+  if (initialQuery !== prevInitialQuery) {
+    setPrevInitialQuery(initialQuery)
     setValue(initialQuery)
-  }, [initialQuery])
+  }
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
