@@ -72,4 +72,7 @@ All notable project changes should be recorded here.
 
 ## Sprint 3 - Final Release
 
+- Added M1 PR-01: Final Release Coordination Revised.
+  - Created `docs/sprint-tracking/release-checklist.md` with nine-page page-map acceptance table, deployment readiness checks, role-based demo paths for Student, Alumni, Moderator, and Admin, quality checks against acceptance criteria, and Sprint 3 open item register.
+
 - Leaderboard, badges, moderation, user management, analytics, deployment, QA, and final documentation.
