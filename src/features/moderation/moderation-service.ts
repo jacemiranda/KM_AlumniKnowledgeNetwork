@@ -17,6 +17,8 @@ export type ModerationAction =
   | 'award_badge'
   | 'revoke_badge'
   | 'toggle_field'
+  | 'create_field'
+  | 'create_tag'
 
 export type ManagedUser = {
   id: string
@@ -140,6 +142,27 @@ export async function blockUser(actorId: string, targetId: string, reason?: stri
   if (error) throw new Error(error.message)
 
   await logAction(actorId, 'block_user', 'user', targetId, reason)
+
+  // Create notification for blocked user
+  try {
+    await supabase
+      .from('notifications')
+      .insert({
+        user_id: targetId,
+        type: 'moderation_notice',
+        actor_id: actorId,
+        data: {
+          title: 'Your account has been blocked',
+          message: reason || 'Your account has been suspended.',
+          icon_type: 'moderation',
+          action_url: '/profile',
+          actor_name: 'Moderator',
+        },
+      })
+  } catch (notifError) {
+    // Log but don't fail if notification fails
+    console.error('Failed to create notification:', notifError)
+  }
 }
 
 export async function unblockUser(actorId: string, targetId: string, reason?: string) {
@@ -153,6 +176,27 @@ export async function unblockUser(actorId: string, targetId: string, reason?: st
   if (error) throw new Error(error.message)
 
   await logAction(actorId, 'unblock_user', 'user', targetId, reason)
+
+  // Create notification for unblocked user
+  try {
+    await supabase
+      .from('notifications')
+      .insert({
+        user_id: targetId,
+        type: 'moderation_notice',
+        actor_id: actorId,
+        data: {
+          title: 'Your account has been restored',
+          message: 'You can now use the platform again.',
+          icon_type: 'moderation',
+          action_url: '/profile',
+          actor_name: 'Moderator',
+        },
+      })
+  } catch (notifError) {
+    // Log but don't fail if notification fails
+    console.error('Failed to create notification:', notifError)
+  }
 }
 
 export async function updateUserRole(actorId: string, targetId: string, newRole: AppRole, reason?: string) {
@@ -239,6 +283,15 @@ export async function fetchManagedComments(
 export async function moderatePost(actorId: string, postId: string, action: 'hidden' | 'removed', reason?: string) {
   const supabase = getSupabaseClient()
 
+  // Fetch post author
+  const { data: postData, error: postError } = await supabase
+    .from('posts')
+    .select('author_id, title')
+    .eq('id', postId)
+    .single()
+
+  if (postError) throw postError
+
   const { error } = await supabase
     .from('posts')
     .update({ status: action as ContentStatus })
@@ -248,10 +301,41 @@ export async function moderatePost(actorId: string, postId: string, action: 'hid
 
   const logAction_ = action === 'hidden' ? 'hide_post' : 'remove_post'
   await logAction(actorId, logAction_ as ModerationAction, 'post', postId, reason)
+
+  // Create notification for post author
+  try {
+    await supabase
+      .from('notifications')
+      .insert({
+        user_id: postData.author_id,
+        type: 'moderation_notice',
+        actor_id: actorId,
+        related_post_id: postId,
+        data: {
+          title: action === 'hidden' ? 'Post hidden' : 'Post removed',
+          message: postData.title,
+          icon_type: 'moderation',
+          action_url: `/post/${postId}`,
+          actor_name: 'Moderator',
+        },
+      })
+  } catch (notifError) {
+    // Log but don't fail if notification fails
+    console.error('Failed to create notification:', notifError)
+  }
 }
 
 export async function restorePost(actorId: string, postId: string, reason?: string) {
   const supabase = getSupabaseClient()
+
+  // Fetch post author
+  const { data: postData, error: postError } = await supabase
+    .from('posts')
+    .select('author_id, title')
+    .eq('id', postId)
+    .single()
+
+  if (postError) throw postError
 
   const { error } = await supabase
     .from('posts')
@@ -261,10 +345,41 @@ export async function restorePost(actorId: string, postId: string, reason?: stri
   if (error) throw new Error(error.message)
 
   await logAction(actorId, 'restore_post', 'post', postId, reason)
+
+  // Create notification for post author
+  try {
+    await supabase
+      .from('notifications')
+      .insert({
+        user_id: postData.author_id,
+        type: 'moderation_notice',
+        actor_id: actorId,
+        related_post_id: postId,
+        data: {
+          title: 'Post restored',
+          message: postData.title,
+          icon_type: 'moderation',
+          action_url: `/post/${postId}`,
+          actor_name: 'Moderator',
+        },
+      })
+  } catch (notifError) {
+    // Log but don't fail if notification fails
+    console.error('Failed to create notification:', notifError)
+  }
 }
 
 export async function moderateComment(actorId: string, commentId: string, action: 'hidden' | 'removed', reason?: string) {
   const supabase = getSupabaseClient()
+
+  // Fetch comment author
+  const { data: commentData, error: commentError } = await supabase
+    .from('comments')
+    .select('author_id, post_id, content')
+    .eq('id', commentId)
+    .single()
+
+  if (commentError) throw commentError
 
   const { error } = await supabase
     .from('comments')
@@ -275,10 +390,42 @@ export async function moderateComment(actorId: string, commentId: string, action
 
   const logAction_ = action === 'hidden' ? 'hide_comment' : 'remove_comment'
   await logAction(actorId, logAction_ as ModerationAction, 'comment', commentId, reason)
+
+  // Create notification for comment author
+  try {
+    await supabase
+      .from('notifications')
+      .insert({
+        user_id: commentData.author_id,
+        type: 'moderation_notice',
+        actor_id: actorId,
+        related_post_id: commentData.post_id,
+        related_comment_id: commentId,
+        data: {
+          title: action === 'hidden' ? 'Comment hidden' : 'Comment removed',
+          message: commentData.content.substring(0, 100),
+          icon_type: 'moderation',
+          action_url: `/post/${commentData.post_id}#comment-${commentId}`,
+          actor_name: 'Moderator',
+        },
+      })
+  } catch (notifError) {
+    // Log but don't fail if notification fails
+    console.error('Failed to create notification:', notifError)
+  }
 }
 
 export async function restoreComment(actorId: string, commentId: string, reason?: string) {
   const supabase = getSupabaseClient()
+
+  // Fetch comment author
+  const { data: commentData, error: commentError } = await supabase
+    .from('comments')
+    .select('author_id, post_id, content')
+    .eq('id', commentId)
+    .single()
+
+  if (commentError) throw commentError
 
   const { error } = await supabase
     .from('comments')
@@ -288,9 +435,64 @@ export async function restoreComment(actorId: string, commentId: string, reason?
   if (error) throw new Error(error.message)
 
   await logAction(actorId, 'restore_comment', 'comment', commentId, reason)
+
+  // Create notification for comment author
+  try {
+    await supabase
+      .from('notifications')
+      .insert({
+        user_id: commentData.author_id,
+        type: 'moderation_notice',
+        actor_id: actorId,
+        related_post_id: commentData.post_id,
+        related_comment_id: commentId,
+        data: {
+          title: 'Comment restored',
+          message: commentData.content.substring(0, 100),
+          icon_type: 'moderation',
+          action_url: `/post/${commentData.post_id}#comment-${commentId}`,
+          actor_name: 'Moderator',
+        },
+      })
+  } catch (notifError) {
+    // Log but don't fail if notification fails
+    console.error('Failed to create notification:', notifError)
+  }
 }
 
-// ── Field Management ──────────────────────────────────────────────────
+// ── Field & Tag Management ──────────────────────────────────────────────
+
+export async function createField(actorId: string, name: string) {
+  const supabase = getSupabaseClient()
+  const slug = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
+  const { data, error } = await supabase
+    .from('fields')
+    .insert({ name, slug, is_active: true })
+    .select('id')
+    .single()
+
+  if (error) throw new Error(error.message)
+
+  await logAction(actorId, 'create_field', 'field', data.id, undefined, { name })
+  return data
+}
+
+export async function createTag(actorId: string, name: string) {
+  const supabase = getSupabaseClient()
+  const slug = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
+  const { data, error } = await supabase
+    .from('tags')
+    .insert({ name, slug })
+    .select('id')
+    .single()
+
+  if (error) throw new Error(error.message)
+
+  await logAction(actorId, 'create_tag', 'tag', data.id, undefined, { name })
+  return data
+}
 
 export async function toggleField(actorId: string, fieldId: string, isActive: boolean) {
   const supabase = getSupabaseClient()

@@ -22,13 +22,14 @@ describe('Schema migrations', () => {
     'tags',
     'post_tags',
     'comments',
-    'votes',
+    'post_votes',
+    'comment_votes',
   ])('creates the %s table', (tableName) => {
     expect(migrationSql).toContain(`create table if not exists public.${tableName}`);
   });
 
-  it.each(['badges', 'user_badges'])(
-    'creates the Sprint 3 %s table',
+  it.each(['badges', 'user_badges', 'notifications'])(
+    'creates the Sprint 4 %s table',
     (tableName) => {
       expect(migrationSql).toContain(
         `create table if not exists public.${tableName}`,
@@ -36,7 +37,7 @@ describe('Schema migrations', () => {
     },
   );
 
-  it.each(['notifications'])(
+  it.each([])(
     'leaves the later-sprint %s table out of current migrations',
     (tableName) => {
       expect(migrationSql).not.toContain(

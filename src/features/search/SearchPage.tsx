@@ -74,7 +74,28 @@ export function SearchPage() {
             placeholder="Search by name, field, tags, skills..."
           />
         </div>
-      </FeedSurface>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 rounded-2xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-2xl">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setActiveTab(tab.key)}
+            className={`flex-1 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] transition cursor-pointer ${
+              activeTab === tab.key
+                ? 'bg-emerald-300/15 text-emerald-100 border border-emerald-300/30'
+                : 'text-slate-400 border border-transparent hover:text-slate-200 hover:bg-white/5'
+            }`}
+          >
+            {tab.label}
+            {hasQuery && !usersLoading && !postsLoading && (
+              <span className="ml-1.5 text-[10px] opacity-70">{tab.count}</span>
+            )}
+          </button>
+        ))}
+      </div>
 
       {/* Empty State — no query */}
       {!hasQuery && (

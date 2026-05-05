@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from './use-auth'
+import { Logo } from '../../components/Logo'
 
 export function LoginPage() {
   const { error, session, signInWithGoogle, status } = useAuth()
@@ -16,15 +17,12 @@ export function LoginPage() {
       </div>
 
       <section className="relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-7 shadow-liquid backdrop-blur-2xl sm:p-10">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-300 to-emerald-600 text-ink-950 shadow-[0_10px_30px_rgba(55,235,172,0.35)]">
-          <span className="text-3xl font-black tracking-tight">E</span>
+        <div className="flex justify-center mb-6">
+          <Logo className="h-16" />
         </div>
-        <h1 className="mt-6 text-center text-3xl uppercase tracking-[0.28em] text-emerald-200/90">
-          Sign In to Alumni Knowledge Network
+        <h1 className="mt-2 text-center text-3xl font-black uppercase tracking-[0.1em] text-emerald-200/90">
+          Sign In
         </h1>
-        <p className="mt-3 text-center text-sm text-slate-300 sm:text-base">
-          Continue with Google to share knowledge through the alumni feed.
-        </p>
 
         {status === 'error' && error ? (
           <div className="mt-7 rounded-2xl border border-rose-300/35 bg-rose-400/10 p-3 text-sm text-rose-100" role="alert">

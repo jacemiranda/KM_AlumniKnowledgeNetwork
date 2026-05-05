@@ -1,26 +1,21 @@
-import { FormEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
 import { fetchFields, fetchSkills, type FieldRow, type SkillRow } from '../auth/profile-service'
 import { getSupabaseClient } from '../../lib/supabase'
-
-type SetupState = 'idle' | 'submitting' | 'error'
+import { EditProfileForm } from '../profile/EditProfileForm'
 
 type UserType = 'student' | 'alumni'
 
 export function SetupPage() {
   const { session, profile, completeProfile } = useAuth()
   const navigate = useNavigate()
-
-  const [name, setName] = useState(profile?.name || session?.user.name || '')
   const [userType, setUserType] = useState<UserType>(profile?.userType ?? 'student')
-  const [fieldId, setFieldId] = useState(profile?.fieldId ?? '')
-  const [bio, setBio] = useState(profile?.bio ?? '')
-  const [profilePictureUrl, setProfilePictureUrl] = useState(profile?.profilePictureUrl ?? '')
-  const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [fields, setFields] = useState<FieldRow[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [skills, setSkills] = useState<SkillRow[]>([])
-  const [state, setState] = useState<SetupState>('idle')
+  const [loadError, setLoadError] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -39,7 +34,7 @@ export function SetupPage() {
         }
       } catch {
         if (isMounted) {
-          setState('error')
+          setLoadError(true)
         }
       }
     }
@@ -59,37 +54,25 @@ export function SetupPage() {
     return <Navigate to="/" replace />
   }
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    if (!name.trim() || !fieldId.trim()) {
-      setState('error')
-      return
-    }
-
-    setState('submitting')
-
+  async function handleProfileFormSuccess() {
     try {
+      if (!session?.user?.id) {
+        throw new Error('User not authenticated')
+      }
+
+      // Update user type during initial setup
       await completeProfile({
-        name: name.trim(),
-        bio: bio.trim(),
+        name: profile?.name || session.user.name || '',
+        bio: profile?.bio || '',
         userType,
-        fieldId,
-        profilePictureUrl,
-        skillIds: selectedSkillIds,
+        fieldId: profile?.fieldId || '',
+        profilePictureUrl: profile?.profilePictureUrl || '',
+        skillIds: [],
       })
       navigate('/')
-    } catch {
-      setState('error')
+    } catch (error) {
+      console.error('Failed to complete setup:', error)
     }
-  }
-
-  const toggleSkill = (skillId: string) => {
-    setSelectedSkillIds((current) =>
-      current.includes(skillId)
-        ? current.filter((selectedSkillId) => selectedSkillId !== skillId)
-        : [...current, skillId],
-    )
   }
 
   return (
@@ -105,43 +88,12 @@ export function SetupPage() {
           Finalize your profile so the feed can match your field, skills, and SECI-aligned contributions.
         </p>
 
-        <form className="mt-8 space-y-7" onSubmit={handleSubmit}>
-          <div className="grid gap-6 md:grid-cols-[128px_1fr] md:items-start">
-            <button
-              type="button"
-              className="mx-auto flex h-32 w-32 items-center justify-center rounded-full border border-white/15 bg-ink-900/50 text-emerald-200 transition hover:border-emerald-300/60"
-              aria-label="Upload profile picture"
-            >
-              <span className="text-4xl">+</span>
-            </button>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-300" htmlFor="full-name">
-                Full Name
-              </label>
-              <input
-                id="full-name"
-                className="mt-2 w-full rounded-2xl border border-white/10 bg-ink-900/60 px-5 py-3 text-base text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder="Your full name"
-                required
-              />
-              <label className="mt-4 block text-xs font-bold uppercase tracking-[0.18em] text-slate-300" htmlFor="profile-picture-url">
-                Profile Picture URL
-              </label>
-              <input
-                id="profile-picture-url"
-                className="mt-2 w-full rounded-2xl border border-white/10 bg-ink-900/60 px-5 py-3 text-base text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-                value={profilePictureUrl}
-                onChange={(event) => setProfilePictureUrl(event.target.value)}
-                placeholder="https://..."
-              />
-            </div>
-          </div>
-
+        <div className="mt-8 space-y-7">
+          {/* User Type Selection - Setup Only */}
           <fieldset>
-            <legend className="text-xs font-bold uppercase tracking-[0.18em] text-slate-300">I am a...</legend>
+            <legend className="text-xs font-bold uppercase tracking-[0.18em] text-slate-300">
+              I am a...
+            </legend>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               <button
                 type="button"
@@ -170,81 +122,27 @@ export function SetupPage() {
             </div>
           </fieldset>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-300" htmlFor="field">
-                Academic Field
-              </label>
-              <select
-                id="field"
-                className="mt-2 w-full rounded-2xl border border-white/10 bg-ink-900/60 px-5 py-3 text-base text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-                value={fieldId}
-                onChange={(event) => setFieldId(event.target.value)}
-                required
-              >
-                <option value="">Select your field of study...</option>
-                {fields.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-300" htmlFor="bio">
-                Short Bio
-              </label>
-              <textarea
-                id="bio"
-                className="mt-2 min-h-28 w-full rounded-2xl border border-white/10 bg-ink-900/60 px-5 py-3 text-base text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-                value={bio}
-                onChange={(event) => setBio(event.target.value)}
-                placeholder="Tell the network about your interests and goals"
-              />
-            </div>
-          </div>
-
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-300">Core Skills and Interests</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {skills.map((skill) => (
-                <label
-                  key={skill.id}
-                  className={`cursor-pointer rounded-full border px-4 py-2 text-sm transition ${
-                    selectedSkillIds.includes(skill.id)
-                      ? 'border-emerald-300/50 bg-emerald-300/15 text-emerald-100'
-                      : 'border-white/15 bg-white/5 text-slate-300'
-                  }`}
-                >
-                  <input
-                    className="sr-only"
-                    type="checkbox"
-                    checked={selectedSkillIds.includes(skill.id)}
-                    onChange={() => toggleSkill(skill.id)}
-                  />
-                  {skill.name}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {state === 'error' ? (
+          {/* Profile Form */}
+          {loadError && (
             <div className="rounded-2xl border border-rose-300/40 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">
-              Please provide your full name and academic field before continuing.
+              Failed to load profile setup options. Please refresh and try again.
             </div>
-          ) : null}
+          )}
 
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="w-full rounded-full bg-gradient-to-r from-emerald-300 to-emerald-500 px-8 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-ink-950 shadow-[0_10px_26px_rgba(70,222,163,0.36)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(70,222,163,0.48)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200 md:w-auto"
-              disabled={state === 'submitting'}
-            >
-              {state === 'submitting' ? 'Saving...' : 'Complete Profile'}
-            </button>
-          </div>
-        </form>
+          {!loadError && (
+            <EditProfileForm
+              initialValues={{
+                name: profile?.name || session?.user.name || '',
+                bio: profile?.bio || '',
+                fieldId: profile?.fieldId || '',
+                profilePictureUrl: profile?.profilePictureUrl || '',
+                skills: [],
+              }}
+              onSuccess={handleProfileFormSuccess}
+              isEditing={false}
+            />
+          )}
+        </div>
       </section>
     </main>
   )
