@@ -22,10 +22,6 @@ export const createPostSchema = z.object({
 
 export type CreatePostFormValues = z.infer<typeof createPostSchema>
 
-export const editPostSchema = createPostSchema
-
-export type EditPostFormValues = CreatePostFormValues
-
 export const createCommentSchema = z.object({
   content: z
     .string()

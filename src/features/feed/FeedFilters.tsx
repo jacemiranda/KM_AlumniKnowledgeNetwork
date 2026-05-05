@@ -38,7 +38,7 @@ export function FeedFilters({ filters, onChange }: FeedFiltersProps) {
         onChange={(e) =>
           onChange({ ...filters, fieldId: e.target.value || undefined, page: 1 })
         }
-        className="custom-select rounded-2xl border border-white/10 bg-ink-900/60 px-3 py-2 text-xs text-white focus:border-emerald-300/30 focus:outline-none"
+        className="rounded-2xl border border-white/10 bg-ink-900/60 px-3 py-2 text-xs text-white focus:border-emerald-300/30 focus:outline-none"
       >
         <option value="">All Fields</option>
         {(fieldOptions ?? []).map((field) => (

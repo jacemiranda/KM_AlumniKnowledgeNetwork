@@ -166,31 +166,8 @@ async function fetchBulkScores(ids: string[]): Promise<Map<string, number>> {
   const m = new Map<string, number>()
   if (ids.length === 0) return m
   const supabase = getSupabaseClient()
-
-  // Sum votes from post_votes where the post's author is in ids
-  const { data: postVotes } = await supabase
-    .from('post_votes')
-    .select('value, post:posts(author_id)')
-    .in('post.author_id', ids) as { data: Array<{ value: number; post: { author_id: string } | null }> | null }
-
-  for (const v of postVotes ?? []) {
-    if (v.post) {
-      m.set(v.post.author_id, (m.get(v.post.author_id) ?? 0) + v.value)
-    }
-  }
-
-  // Sum votes from comment_votes where the comment's author is in ids
-  const { data: commentVotes } = await supabase
-    .from('comment_votes')
-    .select('value, comment:comments(author_id)')
-    .in('comment.author_id', ids) as { data: Array<{ value: number; comment: { author_id: string } | null }> | null }
-
-  for (const v of commentVotes ?? []) {
-    if (v.comment) {
-      m.set(v.comment.author_id, (m.get(v.comment.author_id) ?? 0) + v.value)
-    }
-  }
-
+  const { data } = await supabase.from('votes').select('target_id, value').in('target_id', ids)
+  for (const r of data ?? []) { m.set(r.target_id, (m.get(r.target_id) ?? 0) + r.value) }
   return m
 }
 

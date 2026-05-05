@@ -116,37 +116,6 @@ export async function awardBadge(
   if (error) {
     throw new Error(error.message)
   }
-
-  // Create notification for badge earned
-  try {
-    // Fetch badge details
-    const { data: badgeData, error: badgeError } = await supabase
-      .from('badges')
-      .select('name, description')
-      .eq('id', badgeId)
-      .single()
-
-    if (badgeError) throw badgeError
-
-    // Create notification
-    await supabase
-      .from('notifications')
-      .insert({
-        user_id: profileId,
-        type: 'badge_earned',
-        actor_id: awardedBy,
-        data: {
-          title: 'Badge earned!',
-          message: badgeData.name,
-          icon_type: 'badge',
-          action_url: '/profile',
-          actor_name: 'System',
-        },
-      })
-  } catch (notifError) {
-    // Log but don't fail the badge award if notification fails
-    console.error('Failed to create notification:', notifError)
-  }
 }
 
 /**
