@@ -30,11 +30,8 @@ export function LoginPage() {
 
       <section className="relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-7 shadow-liquid backdrop-blur-2xl sm:p-10">
         <div className="flex justify-center mb-6">
-          <Logo className="h-16" />
+          <Logo className="h-20" />
         </div>
-        <h1 className="mt-2 text-center text-3xl font-black uppercase tracking-[0.1em] text-emerald-200/90">
-          Sign In
-        </h1>
 
         {status === 'error' && error ? (
           <div className="mt-7 rounded-2xl border border-rose-300/35 bg-rose-400/10 p-3 text-sm text-rose-100" role="alert">
@@ -49,7 +46,7 @@ export function LoginPage() {
           type="button"
         >
           <span className="text-base">G</span>
-          <span>{status === 'loading' ? 'Checking Session...' : 'Continue with Google'}</span>
+          <span>{status === 'loading' ? 'Checking Session...' : 'Sign In with Google'}</span>
         </button>
 
         <p className="mt-6 text-center text-xs text-slate-400">
@@ -81,14 +78,14 @@ export function LoginPage() {
                 </svg>
               </button>
             </div>
-            
+
             <div className="mt-4 max-h-[60vh] overflow-y-auto pr-4 text-sm text-[#bbcabf] space-y-4">
-              <p><strong>1. Acceptance of Terms</strong><br/>By accessing and using this platform, you accept and agree to be bound by the terms and provision of this agreement.</p>
-              <p><strong>2. Privacy Policy</strong><br/>We respect your privacy and are committed to protecting it. Our Privacy Policy governs the processing of all personal data collected from you in connection with your use of the platform.</p>
-              <p><strong>3. User Conduct</strong><br/>You agree to use our platform only for lawful purposes. You agree not to take any action that might compromise the security of the site, render the site inaccessible to others or otherwise cause damage to the site or the Content.</p>
-              <p><strong>4. Intellectual Property</strong><br/>All content included on this site, such as text, graphics, logos, button icons, images, audio clips, digital downloads, data compilations, and software, is the property of the platform or its content suppliers and protected by international copyright laws.</p>
-              <p><strong>5. Limitation of Liability</strong><br/>In no event shall we be liable for any direct, indirect, punitive, incidental, special or consequential damages arising out of or in any way connected with the use of this platform.</p>
-              <p><strong>6. Modifications</strong><br/>We reserve the right to modify these terms at any time. Your continued use of the platform following the posting of changes will mean you accept those changes.</p>
+              <p><strong>1. Acceptance of Terms</strong><br />By accessing and using this platform, you accept and agree to be bound by the terms and provision of this agreement.</p>
+              <p><strong>2. Privacy Policy</strong><br />We respect your privacy and are committed to protecting it. Our Privacy Policy governs the processing of all personal data collected from you in connection with your use of the platform.</p>
+              <p><strong>3. User Conduct</strong><br />You agree to use our platform only for lawful purposes. You agree not to take any action that might compromise the security of the site, render the site inaccessible to others or otherwise cause damage to the site or the Content.</p>
+              <p><strong>4. Intellectual Property</strong><br />All content included on this site, such as text, graphics, logos, button icons, images, audio clips, digital downloads, data compilations, and software, is the property of the platform or its content suppliers and protected by international copyright laws.</p>
+              <p><strong>5. Limitation of Liability</strong><br />In no event shall we be liable for any direct, indirect, punitive, incidental, special or consequential damages arising out of or in any way connected with the use of this platform.</p>
+              <p><strong>6. Modifications</strong><br />We reserve the right to modify these terms at any time. Your continued use of the platform following the posting of changes will mean you accept those changes.</p>
             </div>
 
             <div className="mt-8 flex justify-end">
