@@ -3,6 +3,8 @@ import { useAuth } from '../auth/use-auth'
 import type { AppRole } from '../auth/profile-service'
 import type { ContentStatus } from '../feed/post-service'
 import { AnalyticsSummary } from '../analytics/AnalyticsSummary'
+import { ModerationQueue, type ModerationQueueItem } from './components/ModerationQueue'
+import { UserManagementTable } from './components/UserManagementTable'
 import {
   useAllUsers,
   useAllFields,
@@ -24,7 +26,7 @@ import {
 
 // ── Tab definitions ────────────────────────────────────────────────────
 
-const TABS = ['Users', 'Content', 'Fields', 'Analytics', 'Log'] as const
+const TABS = ['Users', 'Moderation Queue', 'Fields', 'Analytics', 'Log'] as const
 type Tab = (typeof TABS)[number]
 
 // ── Main Page ──────────────────────────────────────────────────────────
@@ -69,7 +71,7 @@ export function UserManagementPage() {
 
       {/* Tab content */}
       {activeTab === 'Users' && <UsersTab />}
-      {activeTab === 'Content' && <ContentTab />}
+      {activeTab === 'Moderation Queue' && <ModerationQueueTab />}
       {activeTab === 'Fields' && <FieldsTab />}
       {activeTab === 'Analytics' && <AnalyticsSummary />}
       {activeTab === 'Log' && <LogTab />}
@@ -122,77 +124,16 @@ function UsersTab() {
         </select>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5 shadow-liquid backdrop-blur-2xl">
-        {isLoading ? (
-          <div className="p-6 text-center text-sm text-slate-400">Loading users...</div>
-        ) : users.length === 0 ? (
-          <div className="p-6 text-center text-sm text-slate-400">No users found.</div>
-        ) : (
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-white/10 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
-                <th className="px-4 py-3">User</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Posts</th>
-                <th className="px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u.id} className="border-b border-white/5 transition hover:bg-white/[0.03]">
-                  <td className="px-4 py-3">
-                    <p className="font-bold text-white">{u.name || 'Unnamed'}</p>
-                    <p className="text-[10px] text-slate-500">{u.email}</p>
-                  </td>
-                  <td className="px-4 py-3">
-                    {isAdmin ? (
-                      <select
-                        value={u.role}
-                        onChange={(e) => roleMut.mutate({ targetId: u.id, role: e.target.value as AppRole })}
-                        disabled={roleMut.isPending}
-                        className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] text-slate-300 outline-none cursor-pointer"
-                      >
-                        <option value="end_user">end_user</option>
-                        <option value="moderator">moderator</option>
-                        <option value="admin">admin</option>
-                      </select>
-                    ) : (
-                      <RoleBadge role={u.role} />
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={u.status} />
-                  </td>
-                  <td className="px-4 py-3 text-slate-400">{u.post_count}</td>
-                  <td className="px-4 py-3">
-                    {u.status === 'active' ? (
-                      <button
-                        type="button"
-                        onClick={() => blockMut.mutate({ targetId: u.id })}
-                        disabled={blockMut.isPending}
-                        className="rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-1 text-[10px] font-bold text-red-300 transition hover:bg-red-400/20 cursor-pointer disabled:opacity-40"
-                      >
-                        Block
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => unblockMut.mutate({ targetId: u.id })}
-                        disabled={unblockMut.isPending}
-                        className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-[10px] font-bold text-emerald-300 transition hover:bg-emerald-400/20 cursor-pointer disabled:opacity-40"
-                      >
-                        Unblock
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <UserManagementTable
+        users={users}
+        isLoading={isLoading}
+        isAdmin={isAdmin}
+        onRoleChange={(userId, role) => roleMut.mutate({ targetId: userId, role })}
+        onSuspend={(userId) => blockMut.mutate({ targetId: userId })}
+        onBan={(userId) => blockMut.mutate({ targetId: userId, reason: 'Banned by administrator' })}
+        onReinstate={(userId) => unblockMut.mutate({ targetId: userId })}
+        isMutating={blockMut.isPending || unblockMut.isPending || roleMut.isPending}
+      />
 
       {/* Pagination */}
       {total > (filters.limit ?? 15) && (
@@ -202,11 +143,54 @@ function UsersTab() {
   )
 }
 
-// ── Content Tab ────────────────────────────────────────────────────────
+// ── Moderation Queue Tab ──────────────────────────────────────────────
 
-function ContentTab() {
+function moderationReason(status: ContentStatus, kind: 'post' | 'comment') {
+  if (status === 'hidden') {
+    return kind === 'post' ? 'Flagged for review by moderation policy.' : 'Temporarily hidden after a report.'
+  }
+
+  if (status === 'removed') {
+    return kind === 'post' ? 'Removed due to guideline violation.' : 'Removed due to repeated reports.'
+  }
+
+  return kind === 'post' ? 'Reported as potentially misleading content.' : 'Reported for inappropriate tone.'
+}
+
+function ModerationQueueTab() {
   const [contentType, setContentType] = useState<'posts' | 'comments'>('posts')
   const [filters, setFilters] = useState<ContentFilters>({ page: 1, limit: 15 })
+  const postsQuery = useManagedPosts(filters)
+  const commentsQuery = useManagedComments(filters)
+  const modPost = useModeratePost()
+  const restPost = useRestorePost()
+  const modComment = useModerateComment()
+  const restComment = useRestoreComment()
+
+  const queueItems: ModerationQueueItem[] = contentType === 'posts'
+    ? (postsQuery.data?.posts ?? []).map((post) => ({
+      id: post.id,
+      kind: 'post',
+      title: post.title,
+      content: post.content,
+      reason: moderationReason(post.status, 'post'),
+      status: post.status,
+      byline: `by ${post.author?.name ?? 'Unknown'} · ${new Date(post.created_at).toLocaleDateString()}`,
+    }))
+    : (commentsQuery.data?.comments ?? []).map((comment) => ({
+      id: comment.id,
+      kind: 'comment',
+      title: 'Reported Comment',
+      content: comment.content,
+      reason: moderationReason(comment.status, 'comment'),
+      status: comment.status,
+      byline: `by ${comment.author?.name ?? 'Unknown'} · ${new Date(comment.created_at).toLocaleDateString()}`,
+    }))
+
+  const isLoading = contentType === 'posts' ? postsQuery.isLoading : commentsQuery.isLoading
+  const isMutating = modPost.isPending || restPost.isPending || modComment.isPending || restComment.isPending
+
+  const total = contentType === 'posts' ? (postsQuery.data?.total ?? 0) : (commentsQuery.data?.total ?? 0)
 
   return (
     <div className="space-y-4">
@@ -220,7 +204,7 @@ function ContentTab() {
               contentType === t ? 'border border-blue-300/40 bg-blue-300/15 text-blue-100' : 'border border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            {t}
+            {t === 'posts' ? 'Reported Posts' : 'Reported Comments'}
           </button>
         ))}
         <select
@@ -235,87 +219,28 @@ function ContentTab() {
         </select>
       </div>
 
-      {contentType === 'posts' ? <PostsSubTab filters={filters} setFilters={setFilters} /> : <CommentsSubTab filters={filters} setFilters={setFilters} />}
-    </div>
-  )
-}
+      <ModerationQueue
+        items={queueItems}
+        isLoading={isLoading}
+        isMutating={isMutating}
+        onApproveKeep={(item) => {
+          if (item.kind === 'post') {
+            restPost.mutate({ postId: item.id, reason: 'Approved and kept visible' })
+            return
+          }
 
-function PostsSubTab({ filters, setFilters }: { filters: ContentFilters; setFilters: React.Dispatch<React.SetStateAction<ContentFilters>> }) {
-  const { data, isLoading } = useManagedPosts(filters)
-  const modPost = useModeratePost()
-  const restPost = useRestorePost()
-  const posts = data?.posts ?? []
-  const total = data?.total ?? 0
+          restComment.mutate({ commentId: item.id, reason: 'Approved and kept visible' })
+        }}
+        onRemoveDelete={(item) => {
+          if (item.kind === 'post') {
+            modPost.mutate({ postId: item.id, action: 'removed', reason: 'Removed from moderation queue' })
+            return
+          }
 
-  return (
-    <div className="space-y-3">
-      {isLoading && <div className="p-6 text-center text-sm text-slate-400">Loading...</div>}
-      {!isLoading && posts.length === 0 && <div className="p-6 text-center text-sm text-slate-400">No posts found.</div>}
-      {posts.map((p) => (
-        <div key={p.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="font-bold text-white truncate">{p.title}</p>
-              <p className="mt-0.5 text-[10px] text-slate-500">
-                by {p.author?.name} · {p.field?.name} · {new Date(p.created_at).toLocaleDateString()}
-              </p>
-              <p className="mt-1 line-clamp-2 text-xs text-slate-400">{p.content}</p>
-            </div>
-            <div className="flex flex-shrink-0 items-center gap-2">
-              <ContentStatusBadge status={p.status} />
-              {p.status === 'published' && (
-                <>
-                  <ActionBtn label="Hide" color="amber" onClick={() => modPost.mutate({ postId: p.id, action: 'hidden' })} disabled={modPost.isPending} />
-                  <ActionBtn label="Remove" color="red" onClick={() => modPost.mutate({ postId: p.id, action: 'removed' })} disabled={modPost.isPending} />
-                </>
-              )}
-              {p.status !== 'published' && (
-                <ActionBtn label="Restore" color="emerald" onClick={() => restPost.mutate({ postId: p.id })} disabled={restPost.isPending} />
-              )}
-            </div>
-          </div>
-        </div>
-      ))}
-      {total > (filters.limit ?? 15) && (
-        <Pagination page={filters.page ?? 1} total={total} limit={filters.limit ?? 15} onChange={(p) => setFilters((f) => ({ ...f, page: p }))} />
-      )}
-    </div>
-  )
-}
+          modComment.mutate({ commentId: item.id, action: 'removed', reason: 'Removed from moderation queue' })
+        }}
+      />
 
-function CommentsSubTab({ filters, setFilters }: { filters: ContentFilters; setFilters: React.Dispatch<React.SetStateAction<ContentFilters>> }) {
-  const { data, isLoading } = useManagedComments(filters)
-  const modComment = useModerateComment()
-  const restComment = useRestoreComment()
-  const comments = data?.comments ?? []
-  const total = data?.total ?? 0
-
-  return (
-    <div className="space-y-3">
-      {isLoading && <div className="p-6 text-center text-sm text-slate-400">Loading...</div>}
-      {!isLoading && comments.length === 0 && <div className="p-6 text-center text-sm text-slate-400">No comments found.</div>}
-      {comments.map((c) => (
-        <div key={c.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="text-xs text-slate-400 line-clamp-2">{c.content}</p>
-              <p className="mt-1 text-[10px] text-slate-500">by {c.author?.name} · {new Date(c.created_at).toLocaleDateString()}</p>
-            </div>
-            <div className="flex flex-shrink-0 items-center gap-2">
-              <ContentStatusBadge status={c.status} />
-              {c.status === 'published' && (
-                <>
-                  <ActionBtn label="Hide" color="amber" onClick={() => modComment.mutate({ commentId: c.id, action: 'hidden' })} disabled={modComment.isPending} />
-                  <ActionBtn label="Remove" color="red" onClick={() => modComment.mutate({ commentId: c.id, action: 'removed' })} disabled={modComment.isPending} />
-                </>
-              )}
-              {c.status !== 'published' && (
-                <ActionBtn label="Restore" color="emerald" onClick={() => restComment.mutate({ commentId: c.id })} disabled={restComment.isPending} />
-              )}
-            </div>
-          </div>
-        </div>
-      ))}
       {total > (filters.limit ?? 15) && (
         <Pagination page={filters.page ?? 1} total={total} limit={filters.limit ?? 15} onChange={(p) => setFilters((f) => ({ ...f, page: p }))} />
       )}
@@ -404,47 +329,6 @@ function LogTab() {
 }
 
 // ── Shared components ──────────────────────────────────────────────────
-
-function RoleBadge({ role }: { role: AppRole }) {
-  const styles: Record<AppRole, string> = {
-    admin: 'border-purple-300/40 bg-purple-300/10 text-purple-200',
-    moderator: 'border-blue-300/40 bg-blue-300/10 text-blue-200',
-    end_user: 'border-white/10 bg-white/5 text-slate-400',
-  }
-  return <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase ${styles[role]}`}>{role.replace('_', ' ')}</span>
-}
-
-function StatusBadge({ status }: { status: string }) {
-  return (
-    <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase ${
-      status === 'active' ? 'border-emerald-300/40 bg-emerald-300/10 text-emerald-200' : 'border-red-300/40 bg-red-300/10 text-red-200'
-    }`}>
-      {status}
-    </span>
-  )
-}
-
-function ContentStatusBadge({ status }: { status: ContentStatus }) {
-  const map: Record<ContentStatus, string> = {
-    published: 'border-emerald-300/40 bg-emerald-300/10 text-emerald-200',
-    hidden: 'border-amber-300/40 bg-amber-300/10 text-amber-200',
-    removed: 'border-red-300/40 bg-red-300/10 text-red-200',
-  }
-  return <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase ${map[status]}`}>{status}</span>
-}
-
-function ActionBtn({ label, color, onClick, disabled }: { label: string; color: 'emerald' | 'amber' | 'red'; onClick: () => void; disabled: boolean }) {
-  const styles: Record<string, string> = {
-    emerald: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20',
-    amber: 'border-amber-400/30 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20',
-    red: 'border-red-400/30 bg-red-400/10 text-red-300 hover:bg-red-400/20',
-  }
-  return (
-    <button type="button" onClick={onClick} disabled={disabled} className={`rounded-lg border px-3 py-1 text-[10px] font-bold transition cursor-pointer disabled:opacity-40 ${styles[color]}`}>
-      {label}
-    </button>
-  )
-}
 
 function Pagination({ page, total, limit, onChange }: { page: number; total: number; limit: number; onChange: (p: number) => void }) {
   const totalPages = Math.ceil(total / limit)
