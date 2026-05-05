@@ -61,7 +61,7 @@ describe('SearchPage', () => {
   it('renders the search layout and toggles result filters', async () => {
     renderSearchPage()
 
-    expect(screen.getByRole('heading', { name: /^search$/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /^search results for: "react"$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^all/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^posts/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^people/i })).toBeInTheDocument()

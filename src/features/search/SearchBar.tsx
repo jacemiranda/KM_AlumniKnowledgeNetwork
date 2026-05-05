@@ -83,7 +83,7 @@ export function SearchBar({
           value={value}
           onChange={handleChange}
           placeholder={placeholder}
-          className={`w-full border border-white/10 bg-white/5 pl-10 pr-4 text-slate-100 placeholder-slate-500 backdrop-blur-2xl transition focus:border-emerald-300/40 focus:outline-none focus:ring-1 focus:ring-emerald-300/30 ${
+          className={`w-full border border-white/10 bg-white/5 pl-10 pr-10 truncate text-slate-100 placeholder-slate-500 backdrop-blur-2xl transition focus:border-emerald-300/40 focus:outline-none focus:ring-1 focus:ring-emerald-300/30 ${
             compact
               ? 'rounded-xl py-2 text-sm'
               : 'rounded-2xl py-3 text-base shadow-liquid'

@@ -43,7 +43,7 @@ export function SearchPage() {
 
   const showUsers = activeTab === 'all' || activeTab === 'people'
   const showPosts = activeTab === 'all' || activeTab === 'posts'
-  const hasQuery = query.trim().length >= 2
+  const hasQuery = query.trim().length >= 1
   const userCount = users?.length ?? 0
   const postCount = posts?.length ?? 0
 
@@ -61,19 +61,11 @@ export function SearchPage() {
           Discover
         </p>
         <h1 className="mt-2 text-2xl font-black tracking-tight text-white">
-          Search
+          {query ? `Search results for: "${query}"` : 'Search'}
         </h1>
         <p className="mt-2 text-sm text-slate-400">
           Find people, posts, and knowledge by name, field, tags, and skills.
         </p>
-
-        <div className="mt-4">
-          <SearchBar
-            initialQuery={urlQuery}
-            onSearch={handleSearch}
-            placeholder="Search by name, field, tags, skills..."
-          />
-        </div>
       </div>
 
       {/* Tabs */}
@@ -106,7 +98,7 @@ export function SearchPage() {
             </svg>
           </div>
           <p className="text-sm text-slate-400">
-            Type at least 2 characters to start searching.
+            Type at least 1 character to start searching.
           </p>
           <p className="mt-1 text-xs text-slate-500">
             Search across users, posts, fields, and skills.
