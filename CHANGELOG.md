@@ -64,6 +64,11 @@ All notable project changes should be recorded here.
 
 ## Sprint 1 - Foundation
 
+- Added M1 PR-03: Sprint 1 Tracking Revised.
+  - Created `docs/sprint-tracking/sprint1-board.md` with Sprint 1 PR status table, gate criteria status, and board column mapping.
+  - Created `docs/prompt-logs/m1-prompt-log.md` with three Sprint 1 planning entries covering PR-01 through PR-03.
+  - Created three GitHub milestones: Sprint 1 - Foundation, Sprint 2 - Core Interaction, Sprint 3 - Final Release.
+
 - OAuth authentication, first-time profile setup, field and skill taxonomy, feed foundation, and SECI setup.
 
 ## Sprint 2 - Core Interaction
