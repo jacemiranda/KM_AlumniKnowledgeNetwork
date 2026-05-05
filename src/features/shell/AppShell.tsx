@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/use-auth'
-import { NotificationsDropdown } from '../notifications/NotificationsDropdown'
 import { SearchBar } from '../search/SearchBar'
 import { Logo } from '../../components/Logo'
 const baseLinks = [
@@ -23,7 +22,6 @@ export function AppShell() {
   const [isFloatingVisible, setIsFloatingVisible] = useState(false)
   const [floatingStyle, setFloatingStyle] = useState<{ left: number; width: number } | null>(null)
   const [mainStyle, setMainStyle] = useState<{ left: number; width: number } | null>(null)
-  const [showEdgeBlur, setShowEdgeBlur] = useState(false)
 
   useEffect(() => {
     setIsMobileMenuOpen(false)
@@ -44,7 +42,6 @@ export function AppShell() {
       if (!el) {
         setIsScrolledPast(false)
         setFloatingStyle(null)
-        setShowEdgeBlur(false)
         setMainStyle(null)
         return
       }
@@ -66,10 +63,6 @@ export function AppShell() {
         const mainRect = mainEl.getBoundingClientRect()
         setMainStyle({ left: Math.max(0, mainRect.left), width: Math.max(0, mainRect.width) })
       }
-
-      // Show subtle blur overlays when the page is scrolled (and not at bottom)
-      const atBottom = Math.abs((window.innerHeight + pageYOffset) - document.body.scrollHeight) < 2
-      setShowEdgeBlur(pageYOffset > 0 && !atBottom)
     }
 
     updateScrollState()
@@ -103,10 +96,6 @@ export function AppShell() {
               {session.user.userType ?? 'profile pending'} - {session.user.email}
             </p>
           </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <NotificationsDropdown />
         </div>
       </div>
     )
@@ -187,51 +176,13 @@ export function AppShell() {
                   }`}
                   style={{ left: `${floatingStyle.left}px`, width: `${floatingStyle.width}px` }}
                 >
-                  <div className="rounded-3xl border border-white/10 bg-[#131b2e]/80 backdrop-blur-2xl shadow-2xl p-4 sm:p-5">
+                  <div className="rounded-3xl border border-white/10 bg-[#131b2e]/80 backdrop-blur-2xl p-4 sm:p-5" style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3)' }}>
                     {renderTopBarContent()}
                   </div>
                 </div>
               )}
 
               {/* Edge blur overlays to focus center posts while scrolling */}
-              {showEdgeBlur && mainStyle && (
-                <>
-                  {/* Top blur with horizontal fade */}
-                  <div
-                    className="fixed top-0 h-20 pointer-events-none z-40 backdrop-blur-sm"
-                    style={{
-                      left: `${mainStyle.left}px`,
-                      width: `${mainStyle.width}px`,
-                      background: 'linear-gradient(to bottom, rgba(19,27,46,0.3) 0%, rgba(19,27,46,0.15) 50%, rgba(19,27,46,0) 100%), linear-gradient(to right, rgba(19,27,46,0.2) 0%, transparent 20%, transparent 80%, rgba(19,27,46,0.2) 100%)'
-                    }}
-                  />
-                  {/* Bottom blur with horizontal fade */}
-                  <div
-                    className="fixed bottom-0 h-20 pointer-events-none z-40 backdrop-blur-sm"
-                    style={{
-                      left: `${mainStyle.left}px`,
-                      width: `${mainStyle.width}px`,
-                      background: 'linear-gradient(to top, rgba(19,27,46,0.3) 0%, rgba(19,27,46,0.15) 50%, rgba(19,27,46,0) 100%), linear-gradient(to right, rgba(19,27,46,0.2) 0%, transparent 20%, transparent 80%, rgba(19,27,46,0.2) 100%)'
-                    }}
-                  />
-                  {/* Left edge fade */}
-                  <div
-                    className="fixed top-0 bottom-0 w-12 pointer-events-none z-40"
-                    style={{
-                      left: `${mainStyle.left}px`,
-                      background: 'linear-gradient(to right, rgba(19,27,46,0.15) 0%, transparent 100%)'
-                    }}
-                  />
-                  {/* Right edge fade */}
-                  <div
-                    className="fixed top-0 bottom-0 w-12 pointer-events-none z-40"
-                    style={{
-                      right: `calc(100vw - ${mainStyle.left + mainStyle.width}px)`,
-                      background: 'linear-gradient(to left, rgba(19,27,46,0.15) 0%, transparent 100%)'
-                    }}
-                  />
-                </>
-              )}
             </>
           )}
 
