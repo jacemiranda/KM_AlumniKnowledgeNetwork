@@ -104,6 +104,8 @@ All notable project changes should be recorded here.
 
 ## Sprint 2 - Core Interaction
 
+- Added M1 PR-03: Sprint 2 Board Audit Revised.
+  - Created `docs/sprint-tracking/sprint2-board.md` with Sprint 2 PR status table, gate criteria status, integration checkpoint, review readiness, open items, and confirmed demo path.
 - Added M1 PR-01: Standups Sprint 2 Revised.
   - Created `docs/standups/week-03-standup.md` with Sprint 2 Week 1 member updates, blocker tracking, decisions, and next actions.
   - Created `docs/standups/week-04-standup.md` with Sprint 2 Week 2 integration checkpoint, gate confirmation, and close-out coordination.
