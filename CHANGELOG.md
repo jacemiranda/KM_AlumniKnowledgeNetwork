@@ -4,6 +4,11 @@ All notable project changes should be recorded here.
 
 ## Unreleased
 
+- Added M5 Sprint 1 PR-02: README Contributing Revised.
+  - Revised `README.md` with setup guide (prerequisites, clone, env vars, database migrations, dev server), available scripts table, project structure tree, and organized documentation references.
+  - Revised `CONTRIBUTING.md` with pre-reading checklist, branch prefix table, database/migration rules, reviewer checklist, AI agent usage guide, and pre-PR verification steps.
+  - Created M5 prompt log entry for this PR.
+
 - Added Sprint 3 PR-03: Deploy and Hardening Revised.
   - Added Vercel deployment config with Vite build settings and SPA route rewrites.
   - Added `npm run verify:deploy` for lint, tests, and production build verification.
