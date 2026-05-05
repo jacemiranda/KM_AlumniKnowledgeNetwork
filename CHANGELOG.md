@@ -43,6 +43,9 @@ All notable project changes should be recorded here.
 - Added the Sprint 1 PR-02 Supabase schema foundation for profiles, fields, skills, feed posts, and tags with RLS policies and seed taxonomy.
 - Added the Sprint 1 PR-03 Supabase Google OAuth session flow and first-time profile setup persistence.
 - Added Sprint 1 PR-04 documentation artifacts: initial ADR set for implemented decisions and the expanded M2 developer prompt log.
+- Added M5 Sprint 1 PR-03: QA Sprint 1 Log Revised.
+  - Added M5 QA & Documentation Lead prompt log.
+  - Added Sprint 1 documentation checklist tracking all member deliverables.
 - Added Sprint 2 PR-01: Posts, comments, tags, voting, and post-type flow.
   - Database migration 002: `comments` and `votes` tables with RLS policies, indexes, and triggers.
   - Service layer: `post-service`, `comment-service`, `vote-service`, `tag-service` with Supabase CRUD.
