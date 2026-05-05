@@ -16,7 +16,7 @@ export function UserResultCard({ user }: UserResultCardProps) {
   return (
     <Link
       to={`/profile/${user.id}`}
-      className="group flex h-full items-start gap-4 rounded-[28px] border border-white/10 bg-[#131b2e]/60 p-4 shadow-liquid backdrop-blur-2xl transition hover:border-emerald-300/20 hover:bg-white/[0.08]"
+      className="group flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 shadow-liquid backdrop-blur-2xl transition hover:border-emerald-300/20 hover:bg-white/[0.08] cursor-pointer"
     >
       {/* Avatar */}
       <div className="relative flex-shrink-0">
@@ -36,7 +36,7 @@ export function UserResultCard({ user }: UserResultCardProps) {
       {/* Info */}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <h3 className="truncate text-sm font-bold text-white transition-colors group-hover:text-emerald-100">
+          <h3 className="truncate text-sm font-bold text-white group-hover:text-emerald-100 transition-colors">
             {user.name}
           </h3>
           {user.user_type && (
@@ -53,10 +53,12 @@ export function UserResultCard({ user }: UserResultCardProps) {
         </div>
 
         {user.field && (
-            <p className="mt-0.5 text-xs text-slate-400">{user.field.name}</p>
-          )}
+          <p className="mt-0.5 text-xs text-slate-400">{user.field.name}</p>
+        )}
 
-        {user.bio && <p className="mt-1 line-clamp-2 text-xs text-slate-400">{user.bio}</p>}
+        {user.bio && (
+          <p className="mt-1 line-clamp-2 text-xs text-slate-400">{user.bio}</p>
+        )}
 
         {/* Skills */}
         {user.skills.length > 0 && (
