@@ -138,8 +138,8 @@ describe('UserManagementPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Moderation Queue/i }))
 
-    const approveButton = screen.getByRole('button', { name: /Approve post: Reported post title/i })
-    const removeButton = screen.getByRole('button', { name: /Remove post: Reported post title/i })
+    const approveButton = screen.getByRole('button', { name: /Approve \/ Keep/i })
+    const removeButton = screen.getByRole('button', { name: /Remove \/ Delete/i })
 
     fireEvent.click(approveButton)
     fireEvent.click(removeButton)

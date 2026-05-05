@@ -4,8 +4,8 @@ import { useAnalytics } from './use-analytics'
 function AnalyticMetric({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-[#131b2e]/60 p-4 text-center shadow-liquid backdrop-blur-2xl">
-      <p className="text-2xl font-black tracking-tight text-[#dae2fd]">{value.toLocaleString()}</p>
-      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#bbcabf]">{label}</p>
+      <p className="text-2xl font-black tracking-tight text-white">{value.toLocaleString()}</p>
+      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">{label}</p>
     </div>
   )
 }
@@ -27,7 +27,7 @@ function ActivityBars({ values }: { values: number[] }) {
                 className="w-full rounded-md border border-emerald-200/20 bg-emerald-300/20"
                 style={{ height, backgroundColor: `rgba(78, 222, 163, ${Math.max(0.2, ratio)})` }}
               />
-              <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#bbcabf]/70">W{index + 1}</span>
+              <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">W{index + 1}</span>
             </div>
           )
         })}
@@ -50,7 +50,7 @@ export function AnalyticsSummary() {
   if (isLoading) {
     return (
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-liquid backdrop-blur-2xl">
-        <p className="text-sm text-[#bbcabf]">Loading analytics...</p>
+        <p className="text-sm text-slate-400">Loading analytics...</p>
       </div>
     )
   }
@@ -76,7 +76,7 @@ export function AnalyticsSummary() {
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-200">
           Platform Analytics
         </p>
-        <p className="mt-1 text-sm text-[#bbcabf]">
+        <p className="mt-1 text-sm text-slate-400">
           Overview of platform activity — visible to Admin and Moderator only.
         </p>
       </div>
