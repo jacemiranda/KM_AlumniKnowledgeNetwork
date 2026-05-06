@@ -202,6 +202,7 @@ export async function updateProfile(
     fieldId?: string
     profilePictureUrl?: string | null
     skillIds?: string[]
+    customSkillNames?: string[]
   },
 ) {
   // Update profile fields

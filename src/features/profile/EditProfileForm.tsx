@@ -82,21 +82,29 @@ export function EditProfileForm({
 
   // Toggle skill selection
   const [skillInput, setSkillInput] = useState('')
+  const [customSkillNames, setCustomSkillNames] = useState<string[]>([])
 
   function addSkill(skillName: string) {
     const trimmed = skillName.trim()
     if (!trimmed) return
 
-    // Find the skill by name
-    const skill = availableSkills?.find((s) => s.name.toLowerCase() === trimmed.toLowerCase())
-    if (!skill) {
-      alert(`Skill "${trimmed}" not found. Please select from available skills.`)
+    const current = selectedSkills || []
+    const totalCount = current.length + customSkillNames.length
+    if (totalCount >= 20) {
+      setSkillInput('')
       return
     }
 
-    const current = selectedSkills || []
-    if (!current.includes(skill.id) && current.length < 20) {
-      setValue('skills', [...current, skill.id])
+    const skill = availableSkills?.find((s) => s.name.toLowerCase() === trimmed.toLowerCase())
+    if (skill) {
+      if (!current.includes(skill.id)) {
+        setValue('skills', [...current, skill.id])
+      }
+    } else {
+      // Custom skill — allow free-text entry
+      if (!customSkillNames.includes(trimmed)) {
+        setCustomSkillNames((prev) => [...prev, trimmed])
+      }
     }
     setSkillInput('')
   }
@@ -115,6 +123,10 @@ export function EditProfileForm({
   function removeSkill(skillId: string) {
     const current = selectedSkills || []
     setValue('skills', current.filter((id) => id !== skillId))
+  }
+
+  function removeCustomSkill(name: string) {
+    setCustomSkillNames((prev) => prev.filter((n) => n !== name))
   }
 
   async function onSubmit(data: EditProfileFormValues) {
@@ -156,6 +168,7 @@ export function EditProfileForm({
         fieldId: data.fieldId,
         profilePictureUrl,
         skillIds: data.skills || [],
+        customSkillNames,
       })
 
       onSuccess?.()
@@ -293,15 +306,30 @@ export function EditProfileForm({
               </span>
             )
           })}
+          {customSkillNames.map((name) => (
+            <span
+              key={`custom-${name}`}
+              className="flex items-center gap-1 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200"
+            >
+              {name}
+              <button
+                type="button"
+                onClick={() => removeCustomSkill(name)}
+                className="ml-1 text-slate-400 hover:text-white"
+              >
+                ×
+              </button>
+            </span>
+          ))}
           <input
             type="text"
             value={skillInput}
             onChange={(e) => setSkillInput(e.target.value)}
             onKeyDown={handleSkillKeyDown}
-            placeholder={(selectedSkills || []).length === 0 ? 'Type a skill and press Enter or comma...' : ''}
+            placeholder={(selectedSkills || []).length + customSkillNames.length === 0 ? 'Type a skill and press Enter or comma...' : ''}
             className="min-w-[150px] flex-1 bg-transparent py-1 text-sm text-white placeholder:text-slate-500 focus:outline-none"
             list="skill-suggestions"
-            disabled={isSubmitting || isUploadingImage || (selectedSkills || []).length >= 20}
+            disabled={isSubmitting || isUploadingImage || (selectedSkills || []).length + customSkillNames.length >= 20}
           />
           <datalist id="skill-suggestions">
             {(availableSkills || [])

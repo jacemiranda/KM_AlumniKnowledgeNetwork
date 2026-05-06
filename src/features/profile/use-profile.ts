@@ -22,6 +22,7 @@ export type UpdateProfilePayload = {
   fieldId?: string
   profilePictureUrl?: string | null
   skillIds?: string[]
+  customSkillNames?: string[]
 }
 
 // ── Hooks ──────────────────────────────────────────────────────────────
@@ -40,7 +41,28 @@ export function useUpdateProfile() {
       }
 
       const supabase = getSupabaseClient()
-      await updateProfile(supabase, session.user.id, payload)
+
+      // For custom skill names, insert into skills table (ignore conflicts on name),
+      // then select IDs for all names (new and pre-existing) to merge into skillIds.
+      let skillIds = payload.skillIds ?? []
+      if (payload.customSkillNames && payload.customSkillNames.length > 0) {
+        const slugify = (s: string) =>
+          s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        await supabase
+          .from('skills')
+          .upsert(
+            payload.customSkillNames.map((name) => ({ name, slug: slugify(name) })),
+            { onConflict: 'name', ignoreDuplicates: true },
+          )
+        const { data: customRows } = await supabase
+          .from('skills')
+          .select('id')
+          .in('name', payload.customSkillNames)
+        const customIds = (customRows ?? []).map((r: { id: string }) => r.id)
+        skillIds = [...skillIds, ...customIds]
+      }
+
+      await updateProfile(supabase, session.user.id, { ...payload, skillIds })
 
       // Fetch updated profile data
       const { data: updatedProfile, error } = await supabase

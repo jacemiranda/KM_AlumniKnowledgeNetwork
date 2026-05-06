@@ -8,7 +8,7 @@ import { EditProfileForm } from '../profile/EditProfileForm'
 type UserType = 'student' | 'alumni'
 
 export function SetupPage() {
-  const { session, profile } = useAuth()
+  const { session, profile, signOut } = useAuth()
   const navigate = useNavigate()
   const [userType, setUserType] = useState<UserType>(profile?.userType ?? 'student')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -54,6 +54,11 @@ export function SetupPage() {
     return <Navigate to="/" replace />
   }
 
+  async function handleExit() {
+    await signOut()
+    navigate('/login', { replace: true })
+  }
+
   async function handleProfileFormSuccess() {
     try {
       if (!session?.user?.id) {
@@ -80,6 +85,17 @@ export function SetupPage() {
       </div>
 
       <section className="relative z-10 w-full max-w-3xl rounded-3xl border border-white/10 bg-white/5 p-6 shadow-liquid backdrop-blur-2xl sm:p-8 lg:p-10">
+        <button
+          type="button"
+          onClick={() => { void handleExit() }}
+          aria-label="Exit setup and sign out"
+          className="absolute right-4 top-4 text-slate-400 transition-colors hover:text-white"
+        >
+          <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
         <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">Complete Your Profile</h1>
         <p className="mt-2 text-sm text-slate-300 sm:text-base">
           Finalize your profile so the feed can match your field, skills, and SECI-aligned contributions.
