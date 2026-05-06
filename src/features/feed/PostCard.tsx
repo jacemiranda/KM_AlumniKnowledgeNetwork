@@ -99,7 +99,7 @@ export function PostCard({ post }: { post: PostWithRelations }) {
       </Link>
 
       {/* Content preview */}
-      <p className="mt-2 line-clamp-3 text-sm text-slate-300">{post.content}</p>
+      <p className="mt-2 line-clamp-3 whitespace-pre-wrap text-sm text-slate-300">{post.content}</p>
 
       {/* Tags */}
       <div className="mt-4 flex flex-wrap gap-2">

@@ -84,6 +84,7 @@ export function UserManagementPage() {
 // ── Users Tab ──────────────────────────────────────────────────────────
 
 function UsersTab() {
+  const { session } = useAuth()
   const { isAdmin } = useIsPrivileged()
   const [filters, setFilters] = useState<UserFilters>({ page: 1, limit: 15 })
   const [search, setSearch] = useState('')
@@ -171,7 +172,9 @@ function UsersTab() {
                   </td>
                   <td className="px-4 py-3 text-slate-400">{u.post_count}</td>
                   <td className="px-4 py-3">
-                    {u.status === 'active' ? (
+                    {u.id === session?.user.id ? (
+                      <span className="text-[10px] text-slate-500">—</span>
+                    ) : u.status === 'active' ? (
                       <button
                         type="button"
                         onClick={() => blockMut.mutate({ targetId: u.id })}
