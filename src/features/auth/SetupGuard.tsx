@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from './use-auth'
 
@@ -6,8 +7,16 @@ type SetupGuardProps = {
 }
 
 export function SetupGuard({ allowSetupPage }: SetupGuardProps) {
-  const { session, status } = useAuth()
+  const { session, status, profile, signOut } = useAuth()
   const location = useLocation()
+
+  const isBlocked = profile?.status === 'blocked'
+
+  useEffect(() => {
+    if (isBlocked) {
+      void signOut()
+    }
+  }, [isBlocked, signOut])
 
   if (status === 'loading') {
     return <div className="min-h-screen bg-ink-950 p-6 text-slate-100">Loading profile...</div>
@@ -15,6 +24,10 @@ export function SetupGuard({ allowSetupPage }: SetupGuardProps) {
 
   if (!session) {
     return null
+  }
+
+  if (isBlocked) {
+    return <Navigate to="/login" replace />
   }
 
   const isProfileComplete = session.user.profileCompleted === true

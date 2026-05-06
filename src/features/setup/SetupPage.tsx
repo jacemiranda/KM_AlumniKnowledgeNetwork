@@ -8,7 +8,7 @@ import { EditProfileForm } from '../profile/EditProfileForm'
 type UserType = 'student' | 'alumni'
 
 export function SetupPage() {
-  const { session, profile, completeProfile } = useAuth()
+  const { session, profile } = useAuth()
   const navigate = useNavigate()
   const [userType, setUserType] = useState<UserType>(profile?.userType ?? 'student')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -60,16 +60,13 @@ export function SetupPage() {
         throw new Error('User not authenticated')
       }
 
-      // Update user type during initial setup
-      await completeProfile({
-        name: profile?.name || session.user.name || '',
-        bio: profile?.bio || '',
-        userType,
-        fieldId: profile?.fieldId || '',
-        profilePictureUrl: profile?.profilePictureUrl || '',
-        skillIds: [],
-      })
-      navigate('/')
+      const client = getSupabaseClient()
+      await client
+        .from('profiles')
+        .update({ user_type: userType, is_first_time_setup_complete: true })
+        .eq('id', session.user.id)
+
+      navigate('/', { replace: true })
     } catch (error) {
       console.error('Failed to complete setup:', error)
     }
